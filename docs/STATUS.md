@@ -5,19 +5,29 @@
 > desincronice.
 
 **Última actualización:** 2026-08-06
-**Fase actual:** 0 — Setup (sin empezar)
+**Fase actual:** 0 — Setup **completada**. Siguiente: fase 1 (dominio).
 **Arquitectura:** aprobada por el dueño el 2026-08-06, con las correcciones ya incorporadas.
 
 ---
 
 ## Qué existe hoy
 
-- Scaffold de Flutter sin tocar. `lib/main.dart` sigue siendo el "Hello World!" generado.
 - `docs/ARCHITECTURE.md` — el diseño completo.
 - `CLAUDE.md` — stack, invariantes y convenciones.
-- Repo git con remoto en `github.com/Dpachecop/habit_tracker`, rama base `main`.
+- Dependencias instaladas: `flutter_bloc`, `go_router`, `fpdart`, `freezed`, `fl_chart`, `uuid`,
+  `intl`, `equatable`; en dev `build_runner`, `bloc_test`, `mocktail`.
+- Estructura de las tres capas creada (carpetas vacías con `.gitkeep`).
+- `config/theme` — `AppColors` (neutros del chrome) y `HabitPalette` (los 8 slots de color de
+  meta, validados para daltonismo en claro y oscuro). `AppTheme` claro/oscuro.
+- `domain/entities/habit_color_slot.dart` — único tipo de dominio que existe; lo necesitaba el
+  tema. Su orden de declaración es la garantía de contraste, ver `ARCHITECTURE.md` §3.6.
+- `config/router/app_router.dart` + `HomeScreen` placeholder, `main.dart` cableado.
+- `test/app_boot_test.dart` — arranque y no-recreación del router.
 
-**Cero código de producto.** No hay dependencias añadidas, ni carpetas de capas, ni tests.
+`flutter analyze` limpio, tests en verde.
+
+**Todavía no hay lógica de producto:** ni `Habit`, ni `HabitSchedule`, ni rachas, ni Firebase,
+ni blocs.
 
 ---
 
@@ -45,9 +55,6 @@ No volver a abrirlas sin que el dueño lo pida.
 
 ## Qué sigue
 
-**Fase 0 — Setup.** Dependencias en `pubspec.yaml`, estructura de carpetas de las tres capas,
-tema base con la paleta de colores seleccionables, `go_router` mínimo.
-
 **Fase 1 — Dominio.** Es la fase importante: entidades, `HabitSchedule`, `ScheduleVersion`,
 la regla de marcado y el `StreakCalculator` con sus tests. Dart puro, sin UI ni Firebase.
 Si el motor de rachas está bien y probado, el resto es pintar datos.
@@ -57,7 +64,7 @@ Si el motor de rachas está bien y probado, el resto es pintar datos.
 ## Pendientes abiertos
 
 - Proyecto de Firebase sin crear (`flutterfire configure`). Hace falta en la fase 2, no antes.
-- `gh` no está instalado, así que los PRs los abre el dueño desde la web. Las ramas se empujan
-  y se le pasa el enlace.
 - El bundle id sigue siendo el default `com.example.habit_tracker`. Cambiarlo antes de cualquier
   build de distribución.
+- Las carpetas de capa vacías se sostienen con `.gitkeep`; bórralos cuando la carpeta reciba
+  su primer archivo real.
