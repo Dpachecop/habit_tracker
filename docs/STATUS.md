@@ -35,7 +35,8 @@ No volver a abrirlas sin que el dueño lo pida.
 | Rachas | Derivadas siempre, nunca en BD |
 | Hoy / período abierto | Nunca cortan la racha |
 | Sobrecumplir | Prohibido. Para hacer más días hay que editar la meta (§3.5) |
-| Cambio de horario | Versionado con `effectiveFrom`; el pasado conserva sus reglas (§3.4) |
+| Cambio de horario | Versionado con `effectiveFrom`; los períodos cerrados no se tocan (§3.4) |
+| Objetivo de un período | El mayor `times` vigente durante ese período. Cubre subida y bajada (§3.4) |
 | "Diaria" | Es `SpecificWeekdays` con los 7 días, no un modo aparte |
 | Plataformas | android + ios. Web fuera de alcance |
 | Commits | Conventional, solo `feat`/`fix`/`docs`/`refactor`, y **cortos** |

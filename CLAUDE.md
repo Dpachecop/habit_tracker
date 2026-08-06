@@ -38,8 +38,11 @@ Key invariants:
   read it through `habit.scheduleOn(date)`. Editing a schedule appends a version, never
   overwrites — a streak earned under the old rules must survive the change.
 - **Over-completion is not allowed** (`ARCHITECTURE.md` §3.5). Only scheduled days can be checked
-  in `SpecificWeekdays`; `TimesPerPeriod` caps at `times` per period. The domain enforces this and
+  in `SpecificWeekdays`; `TimesPerPeriod` caps at the period target. The domain enforces this and
   returns `ValidationFailure`; the UI only disables the button as a courtesy.
+- A `TimesPerPeriod` period's target is the **highest `times` in force during that period**, not
+  the current one. That single rule handles both raising and lowering the goal mid-period, and
+  guarantees an already-written entry never becomes retroactively illegal.
 - **Streaks are always derived, never persisted.** A stored counter desyncs the moment an old
   entry is edited or a schedule changes.
 - All streak math uses **local dates normalized to midnight**; `completedAt` is stored in UTC.

@@ -198,13 +198,29 @@ class ScheduleVersion {
 
 **Cuándo entra en vigor un cambio:**
 
-- `SpecificWeekdays` → al día siguiente. El día en curso ya se estaba jugando con las reglas viejas.
-- `TimesPerPeriod` → al inicio del **siguiente período**. Cambiar de 3 a 5 días a mitad de semana
-  dejaría esa semana con un requisito imposible o ya cumplido de forma arbitraria; el período en
-  curso se cierra con las reglas con las que empezó.
+- `SpecificWeekdays` → al día siguiente. Los días ya transcurridos conservan sus reglas; si no,
+  añadir un martes te rompería retroactivamente una racha por un martes que nunca te tocó.
+- `TimesPerPeriod` → **el objetivo de un período es el mayor `times` vigente durante ese período.**
 
-Esto es también lo que permite la válvula de escape de §3.5: si quieres cumplir más días de los
-pactados, subes el número en la meta y el cambio aplica desde el período siguiente.
+Esa única regla cubre los dos sentidos del cambio:
+
+| Cambio | Semana en curso | Semana siguiente |
+|---|---|---|
+| 3 → 5 el miércoles | pasa a exigir **5**; los días ya marcados cuentan, faltan 2 | 5 |
+| 5 → 3 el miércoles | sigue en **5**; los 5 días ya marcados siguen siendo válidos | 3 |
+
+El caso de bajada tiene que funcionar así por §3.5: si el cupo bajara a 3 de inmediato, las 5
+entradas ya registradas quedarían por encima del límite y serían ilegales de forma retroactiva.
+Tomando el máximo, ninguna entrada ya escrita deja de ser válida nunca.
+
+Y como el `effectiveFrom` de un cambio es siempre hoy, esto **solo puede afectar al período
+abierto**. Los períodos cerrados calculan su máximo con las versiones que estuvieran vigentes
+entonces y ya no se mueven.
+
+> **Efecto a vigilar:** subir el objetivo cuando quedan pocos días del período puede volverlo
+> inalcanzable (pasar de 3 a 5 un sábado) y garantizar el corte de la racha. La regla se queda
+> como está — la pediste así —, pero el formulario debe avisar: *"esta semana ya no alcanzas los
+> 5 días"*, y que el usuario decida. Quemar una racha en silencio no es aceptable.
 
 ### 3.5 Regla de marcado: no se puede sobrecumplir
 
@@ -213,8 +229,8 @@ semana, no puedes tener 5 marcados: en el papel vas sobrado, pero la meta que te
 
 - `SpecificWeekdays` → solo se puede marcar en días programados. El check ni siquiera aparece
   habilitado un martes si la meta es lunes/miércoles/sábado.
-- `TimesPerPeriod` → se puede marcar cualquier día, pero el check se deshabilita al llegar a
-  `times` en el período actual.
+- `TimesPerPeriod` → se puede marcar cualquier día, pero el check se deshabilita al llegar al
+  objetivo del período actual (el mayor `times` vigente en él, §3.4).
 
 Si el usuario quiere hacer más, **edita la meta y sube el número** — con la vigencia de §3.4.
 
@@ -269,10 +285,9 @@ no distingue: en cada paso hacia atrás usa `habit.scheduleOn(date)` y aplica el
 correspondiera **ese día**. Una racha de 40 días bajo "lunes a viernes" sobrevive al cambio a
 "3 días/semana" y sigue creciendo con las reglas nuevas.
 
-Esto obliga a un detalle en modo B: al agrupar en períodos hay que cortar los buckets también en
-las fronteras de vigencia, para no mezclar medio período con `times = 3` y medio con `times = 5`.
-Por eso §3.4 hace que los cambios de `TimesPerPeriod` entren en vigor en el siguiente período —
-así frontera de vigencia y frontera de período siempre coinciden, y este caso desaparece.
+En modo B los buckets **no se parten** en las fronteras de vigencia. Un período es un período
+entero, y su objetivo es el mayor `times` vigente en él (§3.4). Así, una semana en la que pasaste
+de 3 a 5 se evalúa completa contra 5, contando también los días que marcaste antes del cambio.
 
 ---
 
