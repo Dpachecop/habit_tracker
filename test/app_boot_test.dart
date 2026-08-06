@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_tracker/main.dart';
 
+import 'support/test_dependencies.dart';
+
 void main() {
   group('HabitTrackerApp', () {
     tearDown(() {
@@ -13,7 +15,9 @@ void main() {
     });
 
     testWidgets('boots and lands on the home screen', (tester) async {
-      await tester.pumpWidget(const HabitTrackerApp());
+      await tester.pumpWidget(
+        HabitTrackerApp(dependencies: testDependencies()),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Habits'), findsOneWidget);
@@ -28,7 +32,9 @@ void main() {
         ..localeTestValue = const Locale('es')
         ..localesTestValue = const <Locale>[Locale('es')];
 
-      await tester.pumpWidget(const HabitTrackerApp());
+      await tester.pumpWidget(
+        HabitTrackerApp(dependencies: testDependencies()),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Metas'), findsOneWidget);
@@ -42,7 +48,9 @@ void main() {
         ..localeTestValue = const Locale('ja')
         ..localesTestValue = const <Locale>[Locale('ja')];
 
-      await tester.pumpWidget(const HabitTrackerApp());
+      await tester.pumpWidget(
+        HabitTrackerApp(dependencies: testDependencies()),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Metas'), findsOneWidget);
@@ -51,14 +59,18 @@ void main() {
     testWidgets('keeps one router across rebuilds', (tester) async {
       // The router holds the navigation stack. Rebuilding the root widget must
       // not construct a new one, or every theme change would reset navigation.
-      await tester.pumpWidget(const HabitTrackerApp());
+      await tester.pumpWidget(
+        HabitTrackerApp(dependencies: testDependencies()),
+      );
       await tester.pumpAndSettle();
 
       final MaterialApp first = tester.widget<MaterialApp>(
         find.byType(MaterialApp),
       );
 
-      await tester.pumpWidget(const HabitTrackerApp());
+      await tester.pumpWidget(
+        HabitTrackerApp(dependencies: testDependencies()),
+      );
       await tester.pumpAndSettle();
 
       final MaterialApp second = tester.widget<MaterialApp>(

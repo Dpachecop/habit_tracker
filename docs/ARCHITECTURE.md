@@ -403,6 +403,18 @@ match /users/{uid}/{document=**} {
 }
 ```
 
+Las reglas viven en `firestore.rules` y los índices compuestos en `firestore.indexes.json`, ambos
+en la raíz del proyecto y versionados. Se despliegan con
+`firebase deploy --only firestore:rules,firestore:indexes`.
+
+**El índice `(habitId, date)` no es una optimización**: Firestore rechaza directamente una consulta
+que combine igualdad en `habitId` con rango en `date` si no existe, así que sin él los reportes no
+funcionan.
+
+Las rutas se construyen en un único sitio — `infrastructure/datasources/firestore_paths.dart` —
+porque tienen que coincidir exactamente con las reglas de arriba. Un segmento distinto no da datos
+incorrectos: da `permission-denied` en producción y en ningún otro lado.
+
 ---
 
 ## 7. Blocs
