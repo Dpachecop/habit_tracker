@@ -60,6 +60,7 @@ lib/
 │   │   ├── habit_schedule.dart    # sealed: SpecificWeekdays | TimesPerPeriod
 │   │   ├── schedule_version.dart  # schedule + effectiveFrom
 │   │   ├── habit_category.dart
+│   │   ├── habit_color_slot.dart  # enum de paleta, sin dart:ui
 │   │   ├── time_window.dart       # horario del día u "all day"
 │   │   ├── date_range.dart        # a→b o indeterminada
 │   │   └── streak.dart            # current / longest / lastCompletedDate
@@ -121,7 +122,7 @@ class Habit {
   final String id;              // uuid generado en cliente
   final String name;
   final HabitCategory category;
-  final int colorValue;         // ARGB, elegido por el usuario
+  final HabitColorSlot colorSlot; // slot de paleta, no un ARGB — ver 3.6
   final List<ScheduleVersion> scheduleHistory; // ver 3.2 y 3.4
   final TimeWindow? timeWindow; // null = todo el día
   final DateRange range;        // start + end opcional (indeterminada)
@@ -240,6 +241,29 @@ casi nunca ocurra, pero la regla no vive ahí.
 
 Consecuencia útil: un período cerrado exitoso tiene **exactamente** `times` entradas, nunca más.
 Eso simplifica el conteo de rachas del modo B.
+
+### 3.6 El color es un slot, no un ARGB
+
+`Habit` guarda un `HabitColorSlot` (un enum de 8 valores), no el color resuelto. Dos razones:
+
+1. **Modo oscuro.** Cada slot tiene un paso propio para fondo claro y otro para fondo oscuro; no
+   son el mismo color aclarado. Si guardáramos el ARGB, la meta quedaría congelada en el tema que
+   estuviera activo al crearla y en el otro se vería mal.
+2. **El dominio no importa `dart:ui`.** Un enum es un valor puro; `Color` no.
+
+Resolver slot → color es trabajo de presentación (`HabitPalette`).
+
+La paleta se validó con el verificador de visualización de datos contra las dos superficies:
+banda de luminosidad, piso de croma, separación entre slots adyacentes bajo daltonismo
+(peor ΔE 9.1 claro / 8.4 oscuro, objetivo ≥ 8) y separación en visión normal (peor 19.6 / 19.3,
+piso ≥ 15). **El orden del enum es parte de la garantía**, no cosmético: los slots contiguos son
+los que se comparan. Una meta nueva debería tomar el siguiente slot libre en ese orden, y editar
+un hex suelto invalida la validación de sus vecinos.
+
+Tres slots en modo claro (aqua, amarillo, magenta) quedan por debajo de 3:1 de contraste. Es
+aceptable **solo** porque el color nunca identifica una meta por sí solo: siempre va junto a su
+nombre. Cualquier superficie nueva que pinte el color sin la etiqueta tiene que añadir borde,
+textura o texto.
 
 ---
 
