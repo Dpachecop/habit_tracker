@@ -55,15 +55,17 @@ Key invariants:
 
 ## Conventions
 
+**Commits, branches and PRs are governed by @.claude/rules/commits.md — always in force, no
+exceptions.** That file is the source of truth; the notes below only add what it does not cover.
+
 - **Every class and every function gets a dartdoc `///` comment, in English.** Explain the *why*;
   do not restate the signature. This is a hard requirement from the project owner.
-- Conventional commits, restricted to four types: `feat`, `fix`, `docs`, `refactor`.
 - **Keep commit messages short** — a subject line is usually the whole message. Add a body only
   for a *why* the code cannot express, and then one or two lines, never paragraphs. The project
   owner asked for this explicitly after an over-long first commit.
-- One branch per feature (`feat/habit-form`, `fix/streak-week-boundary`), integrated via PR.
-  Never commit straight to the default branch. `gh` is not installed — push the branch and hand
-  over the PR URL instead of trying to open it.
+- `gh` is not installed — push the branch and hand over the PR URL instead of trying to open it.
+- Branch names follow `<type>/<kebab-name>`: `feat/habit-form`, `fix/streak-week-boundary`,
+  `docs/commit-rules`.
 - `flutter analyze` must be clean before any commit.
 - Domain logic is covered by pure unit tests — no widget test harness needed for `domain/`.
 
