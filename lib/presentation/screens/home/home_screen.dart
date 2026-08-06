@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/l10n_extensions.dart';
+
 /// The main panel: the habit list plus the year calendar underneath.
 ///
 /// A placeholder for now — the habit list arrives with `HabitsBloc` in phase 3
@@ -20,12 +22,12 @@ class HomeScreen extends StatelessWidget {
     final TextTheme text = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Habits')),
+      appBar: AppBar(title: Text(context.l10n.homeTitle)),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Text(
-            'No habits yet.',
+            context.l10n.homeEmpty,
             style: text.bodyLarge,
             textAlign: TextAlign.center,
           ),

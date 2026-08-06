@@ -1,0 +1,113 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Habit Tracker",
+  "@appTitle": {
+    "description": "Product name, shown in the OS task switcher."
+  },
+
+  "homeTitle": "Habits",
+  "@homeTitle": {
+    "description": "Title of the main panel listing every habit."
+  },
+  "homeEmpty": "No habits yet.",
+  "@homeEmpty": {
+    "description": "Shown on the main panel when the user has created nothing."
+  },
+
+  "errorNetwork": "No connection. Your changes will sync once you are back online.",
+  "@errorNetwork": {
+    "description": "Failure code 'network'. Reassuring rather than alarming: offline writes are queued, not lost."
+  },
+  "errorNotFound": "We could not find that.",
+  "@errorNotFound": {
+    "description": "Failure code 'not_found'."
+  },
+  "errorPermission": "You do not have access to that.",
+  "@errorPermission": {
+    "description": "Failure code 'permission'."
+  },
+  "errorCache": "The data stored on this device could not be read.",
+  "@errorCache": {
+    "description": "Failure code 'cache'."
+  },
+  "errorUnknown": "Something went wrong.",
+  "@errorUnknown": {
+    "description": "Failure code 'unknown'. Deliberately vague — the detail goes to the log, not to the user."
+  },
+
+  "errorCompletionArchived": "This habit is archived.",
+  "@errorCompletionArchived": {
+    "description": "Failure code 'completion.archived'."
+  },
+  "errorCompletionOutsideRange": "That day falls outside the habit's date range.",
+  "@errorCompletionOutsideRange": {
+    "description": "Failure code 'completion.outside_range'."
+  },
+  "errorCompletionFutureDate": "You cannot check off a day that has not happened yet.",
+  "@errorCompletionFutureDate": {
+    "description": "Failure code 'completion.future_date'."
+  },
+  "errorCompletionAlreadyRecorded": "You already checked this day off.",
+  "@errorCompletionAlreadyRecorded": {
+    "description": "Failure code 'completion.already_recorded'."
+  },
+  "errorCompletionNotScheduled": "This habit is not scheduled for that day.",
+  "@errorCompletionNotScheduled": {
+    "description": "Failure code 'completion.not_scheduled'. The no-over-completion rule, ARCHITECTURE.md 3.5."
+  },
+  "errorCompletionQuotaReached": "You have already met this period's goal.",
+  "@errorCompletionQuotaReached": {
+    "description": "Failure code 'completion.quota_reached'. The no-over-completion rule, ARCHITECTURE.md 3.5."
+  },
+
+  "checkDisabledNotToday": "Not today",
+  "@checkDisabledNotToday": {
+    "description": "Short label under a disabled check button when the habit is not due today."
+  },
+  "quotaProgressWeek": "{completed}/{target} this week",
+  "@quotaProgressWeek": {
+    "description": "Progress within the current week for an N-times-per-period habit.",
+    "placeholders": {
+      "completed": { "type": "int" },
+      "target": { "type": "int" }
+    }
+  },
+  "quotaProgressMonth": "{completed}/{target} this month",
+  "@quotaProgressMonth": {
+    "description": "Progress within the current month for an N-times-per-period habit.",
+    "placeholders": {
+      "completed": { "type": "int" },
+      "target": { "type": "int" }
+    }
+  },
+  "quotaProgressYear": "{completed}/{target} this year",
+  "@quotaProgressYear": {
+    "description": "Progress within the current year for an N-times-per-period habit.",
+    "placeholders": {
+      "completed": { "type": "int" },
+      "target": { "type": "int" }
+    }
+  },
+
+  "categoryHealth": "Health",
+  "@categoryHealth": { "description": "HabitCategory.health" },
+  "categoryFitness": "Fitness",
+  "@categoryFitness": { "description": "HabitCategory.fitness" },
+  "categoryMind": "Mind",
+  "@categoryMind": { "description": "HabitCategory.mind" },
+  "categoryLearning": "Learning",
+  "@categoryLearning": { "description": "HabitCategory.learning" },
+  "categoryWork": "Work",
+  "@categoryWork": { "description": "HabitCategory.work" },
+  "categoryFinance": "Finance",
+  "@categoryFinance": { "description": "HabitCategory.finance" },
+  "categorySocial": "Social",
+  "@categorySocial": { "description": "HabitCategory.social" },
+  "categoryHome": "Home",
+  "@categoryHome": { "description": "HabitCategory.home" },
+  "categoryCreativity": "Creativity",
+  "@categoryCreativity": { "description": "HabitCategory.creativity" },
+  "categoryOther": "Other",
+  "@categoryOther": { "description": "HabitCategory.other" }
+}

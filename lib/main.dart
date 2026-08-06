@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'config/l10n/app_locales.dart';
 import 'config/router/app_router.dart';
 import 'config/theme/app_theme.dart';
+import 'l10n/generated/app_localizations.dart';
 
 /// Application entry point.
 void main() {
@@ -31,12 +33,19 @@ class _HabitTrackerAppState extends State<HabitTrackerApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Habit Tracker',
+      // onGenerateTitle rather than title: the task-switcher label has to be
+      // translated too, and it can only be read once localizations exist.
+      onGenerateTitle:
+          (BuildContext context) => AppLocalizations.of(context).appTitle,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       // Follow the OS for now; a ThemeCubit takes over when settings ship.
       themeMode: ThemeMode.system,
+      localizationsDelegates: AppLocales.delegates,
+      supportedLocales: AppLocales.supported,
+      // No `locale` override either: the app follows the device language until
+      // the settings screen can offer a switch and somewhere to persist it.
       routerConfig: _router,
     );
   }
