@@ -1,0 +1,36 @@
+{
+  "@@locale": "es",
+
+  "appTitle": "Habit Tracker",
+  "homeTitle": "Metas",
+  "homeEmpty": "Todavía no tienes metas.",
+
+  "errorNetwork": "Sin conexión. Tus cambios se sincronizarán cuando vuelvas a tener red.",
+  "errorNotFound": "No encontramos eso.",
+  "errorPermission": "No tienes acceso a eso.",
+  "errorCache": "No se pudieron leer los datos guardados en este dispositivo.",
+  "errorUnknown": "Algo salió mal.",
+
+  "errorCompletionArchived": "Esta meta está archivada.",
+  "errorCompletionOutsideRange": "Ese día queda fuera del rango de fechas de la meta.",
+  "errorCompletionFutureDate": "No puedes marcar un día que todavía no ha pasado.",
+  "errorCompletionAlreadyRecorded": "Ya marcaste este día.",
+  "errorCompletionNotScheduled": "Esta meta no toca ese día.",
+  "errorCompletionQuotaReached": "Ya cumpliste el objetivo de este período.",
+
+  "checkDisabledNotToday": "Hoy no toca",
+  "quotaProgressWeek": "{completed}/{target} esta semana",
+  "quotaProgressMonth": "{completed}/{target} este mes",
+  "quotaProgressYear": "{completed}/{target} este año",
+
+  "categoryHealth": "Salud",
+  "categoryFitness": "Ejercicio",
+  "categoryMind": "Mente",
+  "categoryLearning": "Aprendizaje",
+  "categoryWork": "Trabajo",
+  "categoryFinance": "Finanzas",
+  "categorySocial": "Social",
+  "categoryHome": "Hogar",
+  "categoryCreativity": "Creatividad",
+  "categoryOther": "Otros"
+}

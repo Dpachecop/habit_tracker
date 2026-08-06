@@ -4,11 +4,48 @@ import 'package:habit_tracker/main.dart';
 
 void main() {
   group('HabitTrackerApp', () {
+    tearDown(() {
+      // The locale override is global to the binding; leaving it set would
+      // leak into whatever test runs next in this file.
+      TestWidgetsFlutterBinding.instance.platformDispatcher
+        ..clearLocaleTestValue()
+        ..clearLocalesTestValue();
+    });
+
     testWidgets('boots and lands on the home screen', (tester) async {
       await tester.pumpWidget(const HabitTrackerApp());
       await tester.pumpAndSettle();
 
       expect(find.text('Habits'), findsOneWidget);
+    });
+
+    testWidgets('renders in Spanish on a Spanish device', (tester) async {
+      // End-to-end proof that the delegates are actually wired into
+      // MaterialApp: a screen string, resolved through the device locale.
+      // MaterialApp resolves against the whole preference list, so setting
+      // only the single-locale value would leave it reading the real device.
+      tester.platformDispatcher
+        ..localeTestValue = const Locale('es')
+        ..localesTestValue = const <Locale>[Locale('es')];
+
+      await tester.pumpWidget(const HabitTrackerApp());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Metas'), findsOneWidget);
+      expect(find.text('Habits'), findsNothing);
+    });
+
+    testWidgets('falls back to Spanish for an unsupported language', (
+      tester,
+    ) async {
+      tester.platformDispatcher
+        ..localeTestValue = const Locale('ja')
+        ..localesTestValue = const <Locale>[Locale('ja')];
+
+      await tester.pumpWidget(const HabitTrackerApp());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Metas'), findsOneWidget);
     });
 
     testWidgets('keeps one router across rebuilds', (tester) async {

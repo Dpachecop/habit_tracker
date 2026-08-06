@@ -55,9 +55,26 @@ códigos en un solo sitio.
 (`HabitsRepository`, `EntriesRepository`, `AuthRepository`, `HabitsDatasource`,
 `EntriesDatasource`). Los datasources lanzan; los repositorios traducen a `Either<Failure, T>`.
 
+### Módulo de idiomas — español e inglés
+
+Pedido por el dueño el 2026-08-06, fuera del roadmap original. Diseño en `ARCHITECTURE.md` §11.
+
+- `lib/l10n/app_en.arb` (plantilla) y `app_es.arb`; `lib/l10n/generated/` versionado en git para
+  que un clon nuevo analice sin tener que generar antes.
+- `lib/config/l10n/app_locales.dart` — los dos idiomas y los delegates. El orden es `[es, en]`
+  a propósito: es el fallback cuando el dispositivo no habla ninguno.
+- `lib/presentation/l10n/` — `context.l10n`, `FailureCode → frase` (la otra mitad de §5) y
+  `HabitCategory → etiqueta` + `"2/3 esta semana"`.
+- `main.dart` y `HomeScreen` ya no tienen ni un string suelto.
+- `test/presentation/l10n/translations_test.dart` rompe el build si una clave falta en un `.arb`,
+  si un código de fallo o una categoría se queda sin frase propia, o si se declara un idioma sin
+  traducciones.
+
+El idioma sigue al del dispositivo; el selector manual llega con la pantalla de ajustes.
+
 ### Pruebas
 
-96 en verde, `flutter analyze` limpio. `test/domain/`:
+112 en verde, `flutter analyze` limpio. `test/domain/`:
 
 - `fixtures.dart` — constructores de metas y entradas; las fechas ancla son reales de 2026.
 - Entidades: `date_only`, `date_period`, `habit_schedule`, `habit`.
@@ -90,7 +107,9 @@ No volver a abrirlas sin que el dueño lo pida.
 | Objetivo de un período | El mayor `times` vigente durante ese período. Cubre subida y bajada (§3.4) |
 | "Diaria" | Es `SpecificWeekdays` con los 7 días, no un modo aparte |
 | Plataformas | android + ios. Web fuera de alcance |
-| Commits | Conventional, solo `feat`/`fix`/`docs`/`refactor`, y **cortos** |
+| Commits | Conventional, solo `feat`/`fix`/`docs`/`refactor`, y **cortos**. La regla vive en `.claude/rules/commits.md` y se carga en cada sesión desde `CLAUDE.md` |
+| **Idiomas** | **Español e inglés, con `.arb` + `gen_l10n`.** Ningún texto de usuario en el código. Plantilla en inglés (las claves son código), fallback en runtime en español (§11) |
+| **`intl`** | Bajado a `^0.19.0`: es lo que fija `flutter_localizations` en Flutter 3.29.3. No se usaba en ningún sitio todavía |
 | **Modelado del dominio** | **Clases Dart 3 a mano (`sealed`/`final`) + `equatable`, sin `freezed`.** Es lo que dibuja el propio §3.2, y deja `domain/` sin `build_runner` ni archivos generados. `freezed` se reserva para DTOs y estados de bloc |
 | **Un período solo juzga si está completo** | Un bucket de modo B solo puede **cortar** la racha si está cerrado, entero dentro del rango y gobernado por un único modo. Si no, cuenta sus días pero no corta. Cubre la primera semana a medias y el cambio de modo a mitad de semana, y respeta que los buckets no se parten (§3.4) |
 | **Ventana horaria** | Sin soporte para franjas que cruzan medianoche. No hace falta y volvería ambigua la pregunta "¿de qué día es esto?" |
@@ -116,6 +135,8 @@ es rellenarlos.
 - **Aviso del formulario al subir un objetivo** (`ARCHITECTURE.md` §3.4, la nota de "efecto a
   vigilar"): pasar de 3 a 5 un sábado deja la semana inalcanzable y garantiza el corte. El dominio
   ya se comporta así — hay test —, falta que la fase 4 lo avise en pantalla.
+- **Selector manual de idioma.** Hoy se sigue el del dispositivo. Va con la pantalla de ajustes,
+  que es donde habrá dónde persistir la elección; un `LocaleCubit` sin UI sería código muerto.
 - Proyecto de Firebase sin crear. Es lo primero de la fase 2.
 - El bundle id sigue siendo el default `com.example.habit_tracker`. Cambiarlo antes de cualquier
   build de distribución.

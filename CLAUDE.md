@@ -66,6 +66,9 @@ Key invariants:
   over the PR URL instead of trying to open it.
 - `flutter analyze` must be clean before any commit.
 - Domain logic is covered by pure unit tests — no widget test harness needed for `domain/`.
+- **Never hard-code user-facing text.** Every string the user reads lives in `lib/l10n/app_en.arb`
+  and `lib/l10n/app_es.arb`, and reaches the screen through `context.l10n`. Domain→text mappings
+  (failure codes, category names) belong in `lib/presentation/l10n/`. See `ARCHITECTURE.md` §11.
 
 ## Commands
 
@@ -76,6 +79,7 @@ flutter analyze                  # lint + type check (flutter_lints)
 dart format lib test
 flutter test
 flutter test test/domain/services/streak_calculator_test.dart --plain-name 'breaks on missed day'
+flutter gen-l10n                 # after editing any lib/l10n/*.arb (pub get also runs it)
 dart run build_runner build --delete-conflicting-outputs   # once freezed is added
 flutter build apk | ipa
 flutter clean                    # when build/ or .dart_tool/ state goes stale

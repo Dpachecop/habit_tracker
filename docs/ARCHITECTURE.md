@@ -451,6 +451,7 @@ cupo del período agotado. La `HabitCard` usa ese dato para deshabilitar el chec
 
 - **Comentarios en inglés en toda clase y función**, con dartdoc `///`. Explican el *porqué*,
   no reescriben la firma.
+- **Ningún texto de usuario escrito en el código**: va en los `.arb`, en los dos idiomas. Ver §11.
 - Conventional commits, solo cuatro tipos: `feat`, `fix`, `docs`, `refactor`.
 - **Commits cortos.** Una línea de asunto y ya. Sin cuerpo salvo que haya un *porqué* que el
   código no puede contar, y en ese caso una o dos líneas, nunca párrafos.
@@ -479,3 +480,58 @@ Cada fase = una rama = un PR.
 
 La fase 1 es deliberadamente lo primero: si el motor de rachas está bien y probado, todo lo demás
 es pintar datos. Si está mal, la app entera miente.
+
+---
+
+## 11. Idiomas
+
+La app se entrega en **español e inglés**. No es una traducción que se añade al final: es una
+restricción de arquitectura, porque decide dónde puede vivir el texto.
+
+### 11.1 La regla
+
+**Ningún string visible para el usuario se escribe en el código.** Vive en `lib/l10n/*.arb`, en
+los dos idiomas, y llega a pantalla por la clase generada `AppLocalizations`.
+
+Esto no es una preferencia de estilo: es lo que hace posible que `Failure` lleve solo un `code`
+(§5) y que el dominio no sepa de idiomas. Si un widget escribe `Text('Hoy no toca')`, la regla se
+rompió en los dos sentidos — el texto quedó fuera del catálogo y el idioma se coló en la UI.
+
+### 11.2 Dónde vive cada pieza
+
+```
+lib/l10n/
+├── app_en.arb            # plantilla: las claves y sus descripciones, en inglés
+├── app_es.arb            # traducción
+└── generated/            # AppLocalizations — generado, versionado en git
+lib/config/l10n/
+└── app_locales.dart      # qué idiomas ofrece la app y en qué orden, + delegates
+lib/presentation/l10n/
+├── l10n_extensions.dart  # context.l10n
+├── failure_messages.dart # FailureCode → frase. La otra mitad de §5
+└── domain_labels.dart    # HabitCategory → etiqueta, cupo de período → "2/3 esta semana"
+```
+
+Los mapeos `dominio → texto` son de **presentación**, nunca del dominio. El dominio nombra sus
+valores con identificadores en inglés y no sabe cómo se muestran.
+
+La plantilla es la inglesa porque las claves y sus descripciones son código, y el código va en
+inglés (§9). El **fallback en tiempo de ejecución sí es español**: `AppLocales.supported` va
+ordenado `[es, en]`, y Flutter toma el primero cuando el dispositivo no habla ninguno. El orden es
+una decisión, no el resultado alfabético.
+
+### 11.3 Qué está probado
+
+`test/presentation/l10n/translations_test.dart` convierte en build roja los tres fallos silenciosos
+de un módulo de idiomas:
+
+- una clave que existe en un `.arb` y no en el otro;
+- un `FailureCode` o una `HabitCategory` sin frase propia — se comprueba que sean **distintas**,
+  porque una clave olvidada cae al mensaje genérico y eso, sin este test, no se nota;
+- un idioma declarado en `AppLocales` que no tiene traducciones, o al revés.
+
+### 11.4 Pendiente
+
+El idioma **sigue al del dispositivo**. El selector manual llega con la pantalla de ajustes, que es
+donde además habrá dónde persistir la elección; montar hoy un `LocaleCubit` sin UI ni persistencia
+sería código muerto.
