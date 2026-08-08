@@ -4,9 +4,9 @@
 > El roadmap completo vive en `ARCHITECTURE.md` §10 — aquí no se duplica para que no se
 > desincronice.
 
-**Última actualización:** 2026-08-06
-**Fase actual:** 2 — Infraestructura **completada en código**. Falta un paso manual del dueño:
-`flutterfire configure` (ver *Pendientes*). Siguiente: fase 3 (Home).
+**Última actualización:** 2026-08-07
+**Fase actual:** 2 — Infraestructura **completada**, Firebase conectado y desplegado.
+Siguiente: fase 3 (Home).
 **Arquitectura:** aprobada por el dueño el 2026-08-06, con las correcciones ya incorporadas.
 
 ---
@@ -158,6 +158,9 @@ No volver a abrirlas sin que el dueño lo pida.
 | **Fechas en Firestore** | `yyyy-MM-dd` como string, no `Timestamp`. Son días de calendario; un timestamp devolvería la zona horaria que `DateOnly` quita. Además ordena y consulta por rango igual que una fecha |
 | **Errores en streams** | Llegan como `Left` **sin terminar la suscripción**. `handleError` la mataría, y la Home escucha durante toda la vida de la app |
 | **uid por callback** | Los datasources reciben `String? Function()`, no el uid. La sesión cambia en la fase 7 y un uid capturado escribiría en el árbol anterior |
+| **`minSdk` = 23** | Subido desde el 21 de Flutter porque `firebase_auth` lo exige. API 23 es Android 6.0 (2015); el alcance perdido es despreciable |
+| **Bundle id distinto por plataforma** | android `com.example.habit_tracker`, ios `com.example.habitTracker`. Apple no admite guion bajo — el primer intento de registrar la app iOS falló por eso. Al cambiarlo para distribuir, son **dos** strings |
+| **Config de Firebase fuera del repo** | Los tres archivos generados van a `.gitignore` porque el repo es público. Por eso `AppBootstrap` inicializa **sin** `options`: importar `firebase_options.dart` rompería `analyze` y `test` en un clon nuevo |
 | **Sin tests de Firestore real** | `fake_cloud_firestore` 4.1.1 no compila contra `cloud_firestore` 6.8, y la 4.2 exige Dart 3.8 (el proyecto está en 3.7.2). Ver *Pendientes* |
 
 ---
@@ -182,9 +185,6 @@ Antes de que la app arranque hace falta el paso manual de abajo.
 - **Aviso del formulario al subir un objetivo** (`ARCHITECTURE.md` §3.4, la nota de "efecto a
   vigilar"): pasar de 3 a 5 un sábado deja la semana inalcanzable y garantiza el corte. El dominio
   ya se comporta así — hay test —, falta que la fase 4 lo avise en pantalla.
-- **`flutterfire configure` — bloquea el arranque de la app.** Es lo único que falta de la fase 2
-  y no lo puedo hacer yo: requiere login interactivo en Google. Sin él `Firebase.initializeApp()`
-  revienta al abrir la app. Los pasos están al final de este archivo.
 - **Los datasources de Firestore no tienen tests propios.** `fake_cloud_firestore` 4.1.1 ya no
   compila contra `cloud_firestore` 6.8 (cambió la firma de `WriteBatch.update`) y la 4.2 pide Dart
   3.8, que Flutter 3.29.3 no trae. Lo que sí está cubierto: el mapeo entero (ida y vuelta), las
@@ -195,28 +195,47 @@ Antes de que la app arranque hace falta el paso manual de abajo.
 - **Selector manual de idioma.** Hoy se sigue el del dispositivo. Va con la pantalla de ajustes,
   que es donde habrá dónde persistir la elección; un `LocaleCubit` sin UI sería código muerto.
 - Proyecto de Firebase sin crear. Es lo primero de la fase 2.
-- El bundle id sigue siendo el default `com.example.habit_tracker`. Cambiarlo antes de cualquier
-  build de distribución.
+- **El bundle id sigue siendo el default.** Cambiarlo antes de cualquier build de distribución, y
+  recordar que son dos: `com.example.habit_tracker` en android y `com.example.habitTracker` en ios.
+  Cambiarlo obliga a volver a registrar las apps en Firebase y a regenerar la configuración.
+- **App Check sin montar.** Es lo que evita que un tercero use tus credenciales de cliente para
+  crear cuentas anónimas y gastar cuota. Las reglas ya impiden que lea datos ajenos; esto es cuota,
+  no confidencialidad. Vale la pena antes de publicar.
 - Quedan `.gitkeep` en `config/constants`, `presentation/blocs` y `presentation/widgets/shared`;
   bórralos cuando la carpeta reciba su primer archivo real.
 
 ---
 
-## Paso manual pendiente: conectar Firebase
+## Firebase — estado real
 
-Sin esto la app compila y los tests pasan, pero al abrirla `Firebase.initializeApp()` falla.
-Requiere login interactivo, así que lo tiene que correr el dueño:
+Proyecto **`habit-tracker-f30b61`** (display name *Habit Tracker*), creado el 2026-08-07.
+Consola: <https://console.firebase.google.com/project/habit-tracker-f30b61>
+
+Hecho y verificado:
+
+- Apps registradas: android `com.example.habit_tracker`, ios `com.example.habitTracker`.
+- Base de datos Firestore `(default)` creada en `nam5`.
+- Reglas e índices desplegados desde `firestore.rules` y `firestore.indexes.json`.
+- Proveedor **Anonymous** habilitado en Authentication.
+
+### Los archivos de configuración NO están en el repo
+
+`lib/firebase_options.dart`, `android/app/google-services.json` y
+`ios/Runner/GoogleService-Info.plist` están en `.gitignore`. El repo es público y, aunque esas
+claves **no son secretos** — lo que protege los datos son las reglas, no la API key —, identifican
+el proyecto y permitirían a un tercero crear cuentas anónimas y gastar cuota. Quien quiera cerrar
+eso del todo, lo que hace falta es **App Check**, no esconder la key.
+
+En una máquina nueva, después de clonar:
 
 ```bash
-dart pub global activate flutterfire_cli     # una sola vez
-flutterfire configure                        # crea/elige el proyecto y escribe la config nativa
-firebase deploy --only firestore:rules,firestore:indexes
+firebase login
+flutterfire configure --project=habit-tracker-f30b61 \
+  --platforms=android,ios \
+  --android-package-name=com.example.habit_tracker \
+  --ios-bundle-id=com.example.habitTracker --yes
 ```
 
-`flutterfire configure` escribe `android/app/google-services.json` y
-`ios/Runner/GoogleService-Info.plist`. El código **no** usa `firebase_options.dart`: en android e
-ios el SDK nativo lee esos dos archivos por su cuenta, y esta app no tiene target web. Si algún día
-lo tuviera, ahí sí habría que pasarle `options: DefaultFirebaseOptions.currentPlatform`.
-
-En la consola de Firebase hay que habilitar además el proveedor **Anonymous** en Authentication;
-sin él el login anónimo del arranque devuelve `operation-not-allowed`.
+`flutter analyze` y `flutter test` funcionan **sin** ese paso: `AppBootstrap` llama a
+`Firebase.initializeApp()` sin `options` justo para no depender desde Dart de un archivo que no
+está versionado. Solo un build sobre dispositivo necesita los archivos nativos.
