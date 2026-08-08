@@ -19,10 +19,19 @@ abstract final class AppBootstrap {
   static Future<AppDependencies> run() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // No `options:` argument on purpose. This app targets android and ios
-    // only, where `flutterfire configure` writes google-services.json and
-    // GoogleService-Info.plist and the native SDK reads them itself. A web
-    // target would be the one case that needs DefaultFirebaseOptions.
+    // No `options:` argument, and that is a deliberate coupling decision.
+    //
+    // `flutterfire configure` also writes `lib/firebase_options.dart`, but the
+    // three generated config files are gitignored — the repository is public
+    // and they identify the project. Importing the Dart one would make
+    // `flutter analyze` and `flutter test` fail on a fresh clone over a file
+    // that is not in the repository.
+    //
+    // Going without it costs nothing here: this app targets android and ios,
+    // where the native SDKs read google-services.json and
+    // GoogleService-Info.plist themselves at build time. Only a real device
+    // build needs them, which was already true. A web target would be the one
+    // case that forces DefaultFirebaseOptions back in.
     await Firebase.initializeApp();
 
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
