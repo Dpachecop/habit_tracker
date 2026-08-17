@@ -69,6 +69,101 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get homeGreetingMorning => 'Good morning.';
+
+  @override
+  String get homeGreetingAfternoon => 'Good afternoon.';
+
+  @override
+  String get homeGreetingEvening => 'Good evening.';
+
+  @override
+  String homeHabitsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'You have $count habits left to complete today.',
+      one: 'You have 1 habit left to complete today.',
+      zero: 'Nothing left for today. Well done.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeNothingDueToday => 'Nothing is scheduled for today.';
+
+  @override
+  String get homeEmptyHint => 'Create your first goal to start a streak.';
+
+  @override
+  String streakDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count day streak',
+      one: '1 day streak',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get streakNone => 'No streak yet';
+
+  @override
+  String get scheduleDaily => 'Daily';
+
+  @override
+  String scheduleTimesPerWeek(int times) {
+    String _temp0 = intl.Intl.pluralLogic(
+      times,
+      locale: localeName,
+      other: '$times times a week',
+      two: 'Twice a week',
+      one: 'Once a week',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String scheduleTimesPerMonth(int times) {
+    String _temp0 = intl.Intl.pluralLogic(
+      times,
+      locale: localeName,
+      other: '$times times a month',
+      two: 'Twice a month',
+      one: 'Once a month',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String scheduleTimesPerYear(int times) {
+    String _temp0 = intl.Intl.pluralLogic(
+      times,
+      locale: localeName,
+      other: '$times times a year',
+      two: 'Twice a year',
+      one: 'Once a year',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get navHome => 'Home';
+
+  @override
+  String get navAnalytics => 'Analytics';
+
+  @override
+  String get navSettings => 'Settings';
+
+  @override
+  String get navProfile => 'Profile';
+
+  @override
+  String get comingSoon => 'Coming soon.';
+
+  @override
   String get categoryHealth => 'Health';
 
   @override

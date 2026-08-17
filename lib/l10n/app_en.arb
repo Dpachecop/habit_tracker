@@ -90,6 +90,72 @@
     }
   },
 
+  "homeGreetingMorning": "Good morning.",
+  "@homeGreetingMorning": {
+    "description": "Greeting on the home header before noon. No name: the account is anonymous until the last phase, and 'Good morning, null' is worse than no name at all."
+  },
+  "homeGreetingAfternoon": "Good afternoon.",
+  "@homeGreetingAfternoon": { "description": "Greeting between noon and 19h." },
+  "homeGreetingEvening": "Good evening.",
+  "@homeGreetingEvening": { "description": "Greeting from 19h onwards." },
+
+  "homeHabitsLeft": "{count, plural, =0{Nothing left for today. Well done.} =1{You have 1 habit left to complete today.} other{You have {count} habits left to complete today.}}",
+  "@homeHabitsLeft": {
+    "description": "Summary under the greeting. Counts only habits that are due today and still uncompleted.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "homeNothingDueToday": "Nothing is scheduled for today.",
+  "@homeNothingDueToday": {
+    "description": "Shown instead of the count when the user has habits but none of them fall on today."
+  },
+  "homeEmptyHint": "Create your first goal to start a streak.",
+  "@homeEmptyHint": {
+    "description": "Second line of the empty state, under homeEmpty."
+  },
+
+  "streakDays": "{count, plural, =1{1 day streak} other{{count} day streak}}",
+  "@streakDays": {
+    "description": "Streak label on a habit card. Counts completed days, not periods.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "streakNone": "No streak yet",
+  "@streakNone": {
+    "description": "Shown in place of streakDays when the current streak is zero."
+  },
+
+  "scheduleDaily": "Daily",
+  "@scheduleDaily": {
+    "description": "Schedule label for SpecificWeekdays covering all seven days."
+  },
+  "scheduleTimesPerWeek": "{times, plural, =1{Once a week} =2{Twice a week} other{{times} times a week}}",
+  "@scheduleTimesPerWeek": {
+    "description": "Schedule label for TimesPerPeriod over a week. Distinct from a weekday list on purpose: here the user picks which days, and that is a different goal.",
+    "placeholders": { "times": { "type": "int" } }
+  },
+  "scheduleTimesPerMonth": "{times, plural, =1{Once a month} =2{Twice a month} other{{times} times a month}}",
+  "@scheduleTimesPerMonth": {
+    "description": "Schedule label for TimesPerPeriod over a month.",
+    "placeholders": { "times": { "type": "int" } }
+  },
+  "scheduleTimesPerYear": "{times, plural, =1{Once a year} =2{Twice a year} other{{times} times a year}}",
+  "@scheduleTimesPerYear": {
+    "description": "Schedule label for TimesPerPeriod over a year.",
+    "placeholders": { "times": { "type": "int" } }
+  },
+
+  "navHome": "Home",
+  "@navHome": { "description": "Bottom navigation label." },
+  "navAnalytics": "Analytics",
+  "@navAnalytics": { "description": "Bottom navigation label." },
+  "navSettings": "Settings",
+  "@navSettings": { "description": "Bottom navigation label." },
+  "navProfile": "Profile",
+  "@navProfile": { "description": "Bottom navigation label." },
+  "comingSoon": "Coming soon.",
+  "@comingSoon": {
+    "description": "Placeholder body for tabs whose phase has not been built yet."
+  },
+
   "categoryHealth": "Health",
   "@categoryHealth": { "description": "HabitCategory.health" },
   "categoryFitness": "Fitness",

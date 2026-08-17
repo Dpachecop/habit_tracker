@@ -14,6 +14,13 @@ abstract interface class EntriesDatasource {
   /// Emits every habit's entries for [date], and every later change to them.
   Stream<List<HabitEntry>> watchEntriesOn(DateOnly date);
 
+  /// Emits every habit's entries inside a date window.
+  ///
+  /// The home screen's read: it needs enough history to derive a streak per
+  /// habit, and one subscription over a window beats one subscription per habit.
+  /// Callers bound the window — an unbounded read grows without limit.
+  Stream<List<HabitEntry>> watchEntries({DateOnly? from, DateOnly? to});
+
   /// Emits one habit's entries within an optional date window.
   Stream<List<HabitEntry>> watchEntriesForHabit(
     String habitId, {

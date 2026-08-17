@@ -203,6 +203,108 @@ abstract class AppLocalizations {
   /// **'{completed}/{target} this year'**
   String quotaProgressYear(int completed, int target);
 
+  /// Greeting on the home header before noon. No name: the account is anonymous until the last phase, and 'Good morning, null' is worse than no name at all.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning.'**
+  String get homeGreetingMorning;
+
+  /// Greeting between noon and 19h.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon.'**
+  String get homeGreetingAfternoon;
+
+  /// Greeting from 19h onwards.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening.'**
+  String get homeGreetingEvening;
+
+  /// Summary under the greeting. Counts only habits that are due today and still uncompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Nothing left for today. Well done.} =1{You have 1 habit left to complete today.} other{You have {count} habits left to complete today.}}'**
+  String homeHabitsLeft(int count);
+
+  /// Shown instead of the count when the user has habits but none of them fall on today.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is scheduled for today.'**
+  String get homeNothingDueToday;
+
+  /// Second line of the empty state, under homeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first goal to start a streak.'**
+  String get homeEmptyHint;
+
+  /// Streak label on a habit card. Counts completed days, not periods.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day streak} other{{count} day streak}}'**
+  String streakDays(int count);
+
+  /// Shown in place of streakDays when the current streak is zero.
+  ///
+  /// In en, this message translates to:
+  /// **'No streak yet'**
+  String get streakNone;
+
+  /// Schedule label for SpecificWeekdays covering all seven days.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get scheduleDaily;
+
+  /// Schedule label for TimesPerPeriod over a week. Distinct from a weekday list on purpose: here the user picks which days, and that is a different goal.
+  ///
+  /// In en, this message translates to:
+  /// **'{times, plural, =1{Once a week} =2{Twice a week} other{{times} times a week}}'**
+  String scheduleTimesPerWeek(int times);
+
+  /// Schedule label for TimesPerPeriod over a month.
+  ///
+  /// In en, this message translates to:
+  /// **'{times, plural, =1{Once a month} =2{Twice a month} other{{times} times a month}}'**
+  String scheduleTimesPerMonth(int times);
+
+  /// Schedule label for TimesPerPeriod over a year.
+  ///
+  /// In en, this message translates to:
+  /// **'{times, plural, =1{Once a year} =2{Twice a year} other{{times} times a year}}'**
+  String scheduleTimesPerYear(int times);
+
+  /// Bottom navigation label.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// Bottom navigation label.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get navAnalytics;
+
+  /// Bottom navigation label.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navSettings;
+
+  /// Bottom navigation label.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get navProfile;
+
+  /// Placeholder body for tabs whose phase has not been built yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon.'**
+  String get comingSoon;
+
   /// HabitCategory.health
   ///
   /// In en, this message translates to:

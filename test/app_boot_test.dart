@@ -1,76 +1,113 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:habit_tracker/main.dart';
+import 'package:habit_tracker/presentation/screens/shell/placeholder_screen.dart';
 
 import 'support/test_dependencies.dart';
 
 void main() {
+  late InMemoryDependencies deps;
+
+  setUp(() => deps = InMemoryDependencies());
+
+  tearDown(() async {
+    await deps.dispose();
+    // The locale override is global to the binding; leaving it set would leak
+    // into whatever test runs next.
+    TestWidgetsFlutterBinding.instance.platformDispatcher
+      ..clearLocaleTestValue()
+      ..clearLocalesTestValue();
+  });
+
+  /// Boots the app over in-memory storage and lets it settle.
+  ///
+  /// The push is explicit: the fake datasources are broadcast controllers with
+  /// no replay, so nothing reaches a subscriber until something is emitted.
+  Future<void> boot(WidgetTester tester) async {
+    await tester.pumpWidget(HabitTrackerApp(dependencies: deps.dependencies));
+    await tester.pump();
+    deps.emit();
+    await tester.pumpAndSettle();
+  }
+
+  /// Forces the device language for the whole binding.
+  ///
+  /// Both values are set: `MaterialApp` resolves against the preference *list*,
+  /// so setting only the single locale would leave it reading the real device.
+  void useLocale(WidgetTester tester, String languageCode) {
+    tester.platformDispatcher
+      ..localeTestValue = Locale(languageCode)
+      ..localesTestValue = <Locale>[Locale(languageCode)];
+  }
+
   group('HabitTrackerApp', () {
-    tearDown(() {
-      // The locale override is global to the binding; leaving it set would
-      // leak into whatever test runs next in this file.
-      TestWidgetsFlutterBinding.instance.platformDispatcher
-        ..clearLocaleTestValue()
-        ..clearLocalesTestValue();
+    testWidgets('boots and lands on the home screen', (tester) async {
+      await boot(tester);
+
+      expect(find.text('Habit Tracker'), findsOneWidget);
     });
 
-    testWidgets('boots and lands on the home screen', (tester) async {
-      await tester.pumpWidget(
-        HabitTrackerApp(dependencies: testDependencies()),
-      );
-      await tester.pumpAndSettle();
+    testWidgets('shows the empty state when there are no habits', (
+      tester,
+    ) async {
+      await boot(tester);
 
-      expect(find.text('Habits'), findsOneWidget);
+      // Ready-and-empty, not a spinner that never stops.
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(
+        find.text('Create your first goal to start a streak.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('renders in Spanish on a Spanish device', (tester) async {
-      // End-to-end proof that the delegates are actually wired into
-      // MaterialApp: a screen string, resolved through the device locale.
-      // MaterialApp resolves against the whole preference list, so setting
-      // only the single-locale value would leave it reading the real device.
-      tester.platformDispatcher
-        ..localeTestValue = const Locale('es')
-        ..localesTestValue = const <Locale>[Locale('es')];
+      useLocale(tester, 'es');
+      await boot(tester);
 
-      await tester.pumpWidget(
-        HabitTrackerApp(dependencies: testDependencies()),
+      expect(
+        find.text('Crea tu primera meta para empezar una racha.'),
+        findsOneWidget,
       );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Metas'), findsOneWidget);
-      expect(find.text('Habits'), findsNothing);
     });
 
     testWidgets('falls back to Spanish for an unsupported language', (
       tester,
     ) async {
-      tester.platformDispatcher
-        ..localeTestValue = const Locale('ja')
-        ..localesTestValue = const <Locale>[Locale('ja')];
+      useLocale(tester, 'ja');
+      await boot(tester);
 
-      await tester.pumpWidget(
-        HabitTrackerApp(dependencies: testDependencies()),
+      expect(
+        find.text('Crea tu primera meta para empezar una racha.'),
+        findsOneWidget,
       );
+    });
+
+    testWidgets('offers the four tabs and can switch between them', (
+      tester,
+    ) async {
+      await boot(tester);
+
+      expect(find.byType(NavigationBar), findsOneWidget);
+
+      await tester.tap(find.text('Analytics'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Metas'), findsOneWidget);
+      // The tab is a real screen saying it is not built yet, rather than a
+      // blank that looks broken.
+      expect(find.byType(PlaceholderScreen), findsOneWidget);
+      expect(find.text('Coming soon.'), findsOneWidget);
     });
 
     testWidgets('keeps one router across rebuilds', (tester) async {
       // The router holds the navigation stack. Rebuilding the root widget must
       // not construct a new one, or every theme change would reset navigation.
-      await tester.pumpWidget(
-        HabitTrackerApp(dependencies: testDependencies()),
-      );
-      await tester.pumpAndSettle();
+      await boot(tester);
 
       final MaterialApp first = tester.widget<MaterialApp>(
         find.byType(MaterialApp),
       );
 
-      await tester.pumpWidget(
-        HabitTrackerApp(dependencies: testDependencies()),
-      );
+      await tester.pumpWidget(HabitTrackerApp(dependencies: deps.dependencies));
       await tester.pumpAndSettle();
 
       final MaterialApp second = tester.widget<MaterialApp>(

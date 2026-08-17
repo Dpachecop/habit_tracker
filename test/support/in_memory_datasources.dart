@@ -95,12 +95,43 @@ class InMemoryEntriesDatasource implements EntriesDatasource {
   /// completion wrote *nothing*.
   int writeCount = 0;
 
+  final StreamController<List<HabitEntry>> _controller =
+      StreamController<List<HabitEntry>>.broadcast();
+
+  /// Pushes the current contents to every listener.
+  ///
+  /// Writes publish, so a test can assert that the home screen settles on the
+  /// stored truth after an optimistic toggle — which is the behaviour that
+  /// matters and the reason these streams are live rather than one-shot.
+  void emit() => _controller.add(entries.values.toList());
+
+  /// Releases the broadcast controller.
+  Future<void> dispose() => _controller.close();
+
   @override
   Stream<List<HabitEntry>> watchEntriesOn(DateOnly date) {
     final Object? error = failWith;
     if (error != null) return Stream<List<HabitEntry>>.error(error);
-    return Stream<List<HabitEntry>>.value(
-      entries.values.where((HabitEntry entry) => entry.date == date).toList(),
+    return _controller.stream.map(
+      (List<HabitEntry> all) =>
+          all.where((HabitEntry entry) => entry.date == date).toList(),
+    );
+  }
+
+  @override
+  Stream<List<HabitEntry>> watchEntries({DateOnly? from, DateOnly? to}) {
+    final Object? error = failWith;
+    if (error != null) return Stream<List<HabitEntry>>.error(error);
+    return _controller.stream.map(
+      (List<HabitEntry> all) =>
+          all
+              .where(
+                (HabitEntry entry) =>
+                    (from == null || entry.date >= from) &&
+                    (to == null || entry.date <= to),
+              )
+              .toList()
+            ..sort((HabitEntry a, HabitEntry b) => a.date.compareTo(b.date)),
     );
   }
 
@@ -112,7 +143,9 @@ class InMemoryEntriesDatasource implements EntriesDatasource {
   }) {
     final Object? error = failWith;
     if (error != null) return Stream<List<HabitEntry>>.error(error);
-    return Stream<List<HabitEntry>>.value(_query(habitId, from, to));
+    return _controller.stream.map(
+      (List<HabitEntry> _) => _query(habitId, from, to),
+    );
   }
 
   @override
@@ -130,12 +163,14 @@ class InMemoryEntriesDatasource implements EntriesDatasource {
     _throwIfFailing();
     writeCount++;
     entries['${entry.habitId}_${entry.date.toIso8601()}'] = entry;
+    emit();
   }
 
   @override
   Future<void> deleteEntry(String habitId, DateOnly date) async {
     _throwIfFailing();
     entries.remove('${habitId}_${date.toIso8601()}');
+    emit();
   }
 
   /// Applies the habit filter and the optional date window.
