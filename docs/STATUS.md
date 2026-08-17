@@ -4,9 +4,9 @@
 > El roadmap completo vive en `ARCHITECTURE.md` §10 — aquí no se duplica para que no se
 > desincronice.
 
-**Última actualización:** 2026-08-07
-**Fase actual:** 2 — Infraestructura **completada**, Firebase conectado y desplegado.
-Siguiente: fase 3 (Home).
+**Última actualización:** 2026-08-17
+**Fase actual:** 3 — Home **completada**, verificada en emulador Android.
+Siguiente: fase 4 (formulario de meta).
 **Arquitectura:** aprobada por el dueño el 2026-08-06, con las correcciones ya incorporadas.
 
 ---
@@ -109,9 +109,39 @@ anónimo, y luego el grafo). `main.dart` ya inyecta los repositorios con `MultiR
 `firestore.rules` y `firestore.indexes.json` en la raíz, versionados. El índice `(habitId, date)`
 no es opcional: sin él Firestore rechaza la consulta de los reportes.
 
+### De la fase 3 — Home, con el sistema visual del dueño
+
+El diseño **Serene Habit** entró en esta fase: `docs/design/DESIGN.md` + capturas. Decisiones en
+`ARCHITECTURE.md` §12.
+
+`lib/config/theme/` — `AppColors` (tokens del dueño, claros + oscuros derivados de sus propios
+`inverse-*` y `*-fixed-dim`), `AppTypography` (la escala Inter mapeada a los slots de Material),
+`AppDimens` (4px, radios, sombras), `CategoryIcons`. `HabitPalette` conserva los 8 slots y se
+**revalidó** contra las superficies nuevas: pasan todos los gates.
+
+Inter empaquetada en `assets/fonts/` (tres pesos estáticos, no la variable) con su licencia OFL.
+Se empaqueta en vez de bajarse en runtime porque la app tiene que funcionar sin red.
+
+`lib/presentation/blocs/habits/` — `HabitsBloc`. Dos suscripciones (metas y entradas) que se
+recomponen juntas, el toggle optimista con reversión, y el contador de "te quedan N" derivado del
+mismo veredicto del dominio que habilita el check, para que no puedan discrepar.
+
+`lib/presentation/widgets/` — `HabitCard` y `HabitCheckBox`. La tarjeta solo pinta lo que el bloc le
+entrega: nunca recalcula una racha ni decide si el check va habilitado.
+
+`lib/presentation/screens/shell/` — la barra de 4 pestañas con `StatefulShellRoute`, Home real y
+tres placeholders.
+
+`lib/presentation/screens/home/debug_seed_button.dart` — **andamio temporal, borrar en la fase 4.**
+Siembra tres metas que cubren todos los estados de tarjeta. Solo en debug (`kDebugMode`), fuera de
+release. Existe porque la fase 3 dibuja tarjetas y la 4 es la única forma de crear una.
+
+Nuevo en los contratos: `watchEntries({from, to})` — las entradas de **todas** las metas en una
+ventana. Una suscripción para toda la Home en vez de una por meta.
+
 ### Pruebas
 
-172 en verde, `flutter analyze` limpio. `test/domain/`:
+200 en verde, `flutter analyze` limpio. `test/domain/`:
 
 - `fixtures.dart` — constructores de metas y entradas; las fechas ancla son reales de 2026.
 - Entidades: `date_only`, `date_period`, `habit_schedule`, `habit`.
@@ -127,7 +157,12 @@ Y de la fase 2: mappers (ida y vuelta completa, historial multi-versión, docume
 datasources en memoria — incluyendo que una escritura rechazada por §3.5 **no escribe nada** — y
 `FirebaseAuthRepository` sobre `firebase_auth_mocks`.
 
-**Todavía no hay:** blocs ni UI real. La pantalla principal sigue siendo el placeholder.
+Y de la fase 3: `habits_bloc_test` (carga, las dos rachas, el toggle optimista y su reversión, el
+contador), `habit_card_test` (los tres estados, ambos idiomas, modo oscuro, y **dentro de un
+`ListView`** — ver abajo), `translations_test` ampliado.
+
+**Todavía no hay:** formulario para crear metas (fase 4), heatmap (fase 5), Analytics (fase 6),
+cuenta (fase 7).
 
 ---
 
@@ -161,6 +196,12 @@ No volver a abrirlas sin que el dueño lo pida.
 | **`minSdk` = 23** | Subido desde el 21 de Flutter porque `firebase_auth` lo exige. API 23 es Android 6.0 (2015); el alcance perdido es despreciable |
 | **Bundle id distinto por plataforma** | android `com.example.habit_tracker`, ios `com.example.habitTracker`. Apple no admite guion bajo — el primer intento de registrar la app iOS falló por eso. Al cambiarlo para distribuir, son **dos** strings |
 | **Config de Firebase fuera del repo** | Los tres archivos generados van a `.gitignore` porque el repo es público. Por eso `AppBootstrap` inicializa **sin** `options`: importar `firebase_options.dart` rompería `analyze` y `test` en un clon nuevo |
+| **Color de la meta** | Lo elige el usuario: los 8 `HabitColorSlot`. El `DESIGN.md` proponía derivarlo de la categoría, pero eso dejaba 7 categorías sin color y mataba el slot. Los 3 acentos del diseño pasan al chrome (§12.1) |
+| **Icono de la meta** | Sale de la categoría, sin campo nuevo. Tosco a propósito: "Tomar agua" en Salud recibe un corazón, no una gota (§12.2) |
+| **Modo oscuro** | Derivado por mí de los tokens `inverse-*` del propio diseño, no inventado. Pendiente de que el dueño lo revise |
+| **Barra de 4 pestañas en la fase 3** | Aunque solo Home tenga contenido. Cambia la geometría de todas las pantallas; meterla después obligaría a re-maquetar (§12.4) |
+| **Ventana de historial** | 400 días. Una racha más larga se lee truncada; el alternativo es bajar el historial completo para dibujar un número. `Streak.longest` de este bloc **no** sirve para Analytics |
+| **`minSdk` iOS = 15.0** | Subido del 12.0 de la plantilla porque `cloud_firestore` lo exige. El espejo exacto del caso de Android |
 | **Sin tests de Firestore real** | `fake_cloud_firestore` 4.1.1 no compila contra `cloud_firestore` 6.8, y la 4.2 exige Dart 3.8 (el proyecto está en 3.7.2). Ver *Pendientes* |
 
 ---
@@ -198,6 +239,10 @@ Antes de que la app arranque hace falta el paso manual de abajo.
 - **El bundle id sigue siendo el default.** Cambiarlo antes de cualquier build de distribución, y
   recordar que son dos: `com.example.habit_tracker` en android y `com.example.habitTracker` en ios.
   Cambiarlo obliga a volver a registrar las apps en Firebase y a regenerar la configuración.
+- **El estado deshabilitado del check es propuesta mía, no diseño del dueño.** Ninguna captura lo
+  mostraba y es una regla central (§3.5). Está resuelto en §12.3 y funcionando; falta que el dueño
+  lo apruebe o pase un frame propio.
+- **Borrar `debug_seed_button.dart` cuando la fase 4 tenga el formulario.**
 - **App Check sin montar.** Es lo que evita que un tercero use tus credenciales de cliente para
   crear cuentas anónimas y gastar cuota. Las reglas ya impiden que lea datos ajenos; esto es cuota,
   no confidencialidad. Vale la pena antes de publicar.
