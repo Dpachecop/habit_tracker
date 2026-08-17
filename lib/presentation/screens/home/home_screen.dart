@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 import '../../../config/theme/app_dimens.dart';
 import '../../../domain/repositories/entries_repository.dart';
@@ -144,22 +143,12 @@ class _Header extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final ColorScheme scheme = theme.colorScheme;
 
-    // Formatted through intl with the active locale, not through the .arb
-    // files: date patterns per language are already in the ICU data.
-    final String date = DateFormat.yMMMMEEEEd(
-      Localizations.localeOf(context).toLanguageTag(),
-    ).format(state.today.toDateTime());
-
+    // No date line. The mockups had one, but the owner cut it on 2026-08-17:
+    // the user knows what day it is, and the summary underneath already says
+    // everything today-specific that matters.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          date,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: scheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xs),
         Text(_greeting(context), style: theme.textTheme.headlineSmall),
         const SizedBox(height: AppSpacing.sm),
         Text(

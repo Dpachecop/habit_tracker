@@ -18,7 +18,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get homeEmpty => 'Todavía no tienes metas.';
 
   @override
-  String get errorNetwork => 'Sin conexión. Tus cambios se sincronizarán cuando vuelvas a tener red.';
+  String get errorNetwork =>
+      'Sin conexión. Tus cambios se sincronizarán cuando vuelvas a tener red.';
 
   @override
   String get errorNotFound => 'No encontramos eso.';
@@ -27,7 +28,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorPermission => 'No tienes acceso a eso.';
 
   @override
-  String get errorCache => 'No se pudieron leer los datos guardados en este dispositivo.';
+  String get errorCache =>
+      'No se pudieron leer los datos guardados en este dispositivo.';
 
   @override
   String get errorUnknown => 'Algo salió mal.';
@@ -36,10 +38,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorCompletionArchived => 'Esta meta está archivada.';
 
   @override
-  String get errorCompletionOutsideRange => 'Ese día queda fuera del rango de fechas de la meta.';
+  String get errorCompletionOutsideRange =>
+      'Ese día queda fuera del rango de fechas de la meta.';
 
   @override
-  String get errorCompletionFutureDate => 'No puedes marcar un día que todavía no ha pasado.';
+  String get errorCompletionFutureDate =>
+      'No puedes marcar un día que todavía no ha pasado.';
 
   @override
   String get errorCompletionAlreadyRecorded => 'Ya marcaste este día.';
@@ -48,7 +52,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorCompletionNotScheduled => 'Esta meta no toca ese día.';
 
   @override
-  String get errorCompletionQuotaReached => 'Ya cumpliste el objetivo de este período.';
+  String get errorCompletionQuotaReached =>
+      'Ya cumpliste el objetivo de este período.';
 
   @override
   String get checkDisabledNotToday => 'Hoy no toca';
