@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../config/theme/app_dimens.dart';
+import '../../../domain/entities/habit_color_slot.dart';
 import '../../../domain/repositories/entries_repository.dart';
 import '../../../domain/repositories/habits_repository.dart';
 import '../../blocs/habits/habits_bloc.dart';
@@ -10,7 +12,7 @@ import '../../blocs/habits/habits_state.dart';
 import '../../l10n/failure_messages.dart';
 import '../../l10n/l10n_extensions.dart';
 import '../../widgets/habit_card.dart';
-import 'debug_seed_button.dart';
+import '../habit_form/habit_form_screen.dart';
 
 /// The main panel: the day's greeting and the habit list.
 ///
@@ -50,12 +52,18 @@ class _HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.appTitle)),
-      // Debug only, and gone from release builds. Phase 4 replaces it with the
-      // real "new habit" entry point.
-      floatingActionButton: DebugSeedButton.maybeBuild(
-        habits: context.read<HabitsRepository>(),
-        entries: context.read<EntriesRepository>(),
-        onSeeded: () {},
+      // The only way into the form. The design had no entry point for creating
+      // a habit and all four tabs were spoken for, so the owner chose a plain
+      // "+" here.
+      floatingActionButton: FloatingActionButton(
+        onPressed:
+            () => context.push(
+              HabitFormScreen.createPath,
+              extra: _nextFreeColorSlot(
+                context.read<HabitsBloc>().state.summaries,
+              ),
+            ),
+        child: const Icon(Icons.add_rounded),
       ),
       body: BlocConsumer<HabitsBloc, HabitsState>(
         // Refusals are transient and belong in a snackbar, not in the layout:
@@ -87,6 +95,24 @@ class _HomeView extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The palette slot a new habit should start on.
+///
+/// The first one nobody is using, in declaration order. That order is the
+/// colorblind-safety guarantee (`ARCHITECTURE.md` §3.6) — adjacent slots are the
+/// pairs that were validated against each other — so walking it in order is what
+/// keeps two habits created back to back distinguishable.
+///
+/// Past eight it wraps. Two habits sharing a color is not ideal, but it is far
+/// better than inventing a ninth hue that no validation ever saw.
+HabitColorSlot _nextFreeColorSlot(List<HabitSummary> summaries) {
+  final Set<HabitColorSlot> used =
+      summaries.map((HabitSummary summary) => summary.habit.colorSlot).toSet();
+  for (final HabitColorSlot slot in HabitColorSlot.values) {
+    if (!used.contains(slot)) return slot;
+  }
+  return HabitColorSlot.values[used.length % HabitColorSlot.values.length];
 }
 
 /// The list and its header.
@@ -123,6 +149,7 @@ class _Loaded extends StatelessWidget {
               child: HabitCard(
                 summary: summary,
                 onToggle: () => bloc.add(HabitCheckToggled(summary.habit)),
+                onEdit: () => context.push('/habit/${summary.habit.id}'),
               ),
             ),
       ],

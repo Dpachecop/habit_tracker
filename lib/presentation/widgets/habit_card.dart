@@ -18,14 +18,26 @@ import 'habit_check_box.dart';
 /// decided in `HabitsBloc`, and a widget with its own opinion would eventually
 /// disagree with the write that the repository actually allows.
 class HabitCard extends StatelessWidget {
-  /// [onToggle] fires only when the check is actually actionable.
-  const HabitCard({required this.summary, required this.onToggle, super.key});
+  /// [onToggle] fires only when the check is actually actionable; [onEdit]
+  /// fires on a tap anywhere else on the card.
+  const HabitCard({
+    required this.summary,
+    required this.onToggle,
+    this.onEdit,
+    super.key,
+  });
 
   /// The habit and its derived figures.
   final HabitSummary summary;
 
   /// Called when the user taps the check.
   final VoidCallback onToggle;
+
+  /// Called when the user taps the card itself, to edit the habit.
+  ///
+  /// Optional so the card can be rendered read-only — a test, or a future
+  /// screen that lists habits without offering to change them.
+  final VoidCallback? onEdit;
 
   /// Width of the colored spine on the leading edge.
   static const double _accentWidth = 5;
@@ -62,27 +74,32 @@ class HabitCard extends StatelessWidget {
               // has to identify the habit without ever competing with the text.
               SizedBox(width: _accentWidth, child: ColoredBox(color: accent)),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: Row(
-                    children: <Widget>[
-                      _IconBadge(summary: summary, accent: accent),
-                      const SizedBox(width: AppSpacing.gutter),
-                      Expanded(child: _Details(summary: summary)),
-                      const SizedBox(width: AppSpacing.gutter),
-                      HabitCheckBox(
-                        accent: accent,
-                        isChecked: summary.isCompletedToday,
-                        // Tappable when it can be checked *or* unchecked. The
-                        // policy blocks re-checking a finished day, but undoing
-                        // one is always allowed — a mistap has to be correctable,
-                        // and it can only ever shorten a streak, never forge one.
-                        isEnabled:
-                            summary.isActionable || summary.isCompletedToday,
-                        onTap: onToggle,
-                        semanticLabel: _checkSemantics(context),
-                      ),
-                    ],
+                // The card body opens the form. The check sits on top with its
+                // own gesture, so tapping it never opens the editor by mistake.
+                child: InkWell(
+                  onTap: onEdit,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Row(
+                      children: <Widget>[
+                        _IconBadge(summary: summary, accent: accent),
+                        const SizedBox(width: AppSpacing.gutter),
+                        Expanded(child: _Details(summary: summary)),
+                        const SizedBox(width: AppSpacing.gutter),
+                        HabitCheckBox(
+                          accent: accent,
+                          isChecked: summary.isCompletedToday,
+                          // Tappable when it can be checked *or* unchecked. The
+                          // policy blocks re-checking a finished day, but undoing
+                          // one is always allowed — a mistap has to be correctable,
+                          // and it can only ever shorten a streak, never forge one.
+                          isEnabled:
+                              summary.isActionable || summary.isCompletedToday,
+                          onTap: onToggle,
+                          semanticLabel: _checkSemantics(context),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

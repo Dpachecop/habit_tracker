@@ -170,6 +170,149 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comingSoon => 'Coming soon.';
 
   @override
+  String get formTitleCreate => 'New goal';
+
+  @override
+  String get formTitleEdit => 'Edit goal';
+
+  @override
+  String get formSave => 'Save';
+
+  @override
+  String get formSavedCreate => 'Goal created.';
+
+  @override
+  String get formSavedEdit => 'Changes saved.';
+
+  @override
+  String get formNameLabel => 'Name';
+
+  @override
+  String get formNameHint => 'Morning meditation';
+
+  @override
+  String get formNameRequired => 'Give your goal a name.';
+
+  @override
+  String get formCategoryLabel => 'Category';
+
+  @override
+  String get formColorLabel => 'Color';
+
+  @override
+  String get formScheduleLabel => 'How often';
+
+  @override
+  String get formScheduleModeWeekdays => 'On set days';
+
+  @override
+  String get formScheduleModeTimes => 'A number of times';
+
+  @override
+  String get formWeekdaysRequired => 'Pick at least one day.';
+
+  @override
+  String get formEveryDay => 'Every day';
+
+  @override
+  String get formTimesLabel => 'Times';
+
+  @override
+  String get formPeriodLabel => 'Per';
+
+  @override
+  String get formPeriodWeek => 'Week';
+
+  @override
+  String get formPeriodMonth => 'Month';
+
+  @override
+  String get formPeriodYear => 'Year';
+
+  @override
+  String formTimesTooMany(int max) {
+    return 'At most $max — a day can only be completed once.';
+  }
+
+  @override
+  String get formTimeWindowLabel => 'Time of day';
+
+  @override
+  String get formAllDay => 'All day';
+
+  @override
+  String get formTimeFrom => 'From';
+
+  @override
+  String get formTimeTo => 'To';
+
+  @override
+  String get formTimeWindowInvalid => 'The end has to come after the start.';
+
+  @override
+  String get formDatesLabel => 'Dates';
+
+  @override
+  String get formStartDate => 'Starts';
+
+  @override
+  String get formEndDate => 'Ends';
+
+  @override
+  String get formNoEndDate => 'No end date';
+
+  @override
+  String get formEndBeforeStart => 'The end cannot come before the start.';
+
+  @override
+  String get formScheduleChangeTomorrow =>
+      'The new days apply from tomorrow. Every day up to today keeps the old schedule, so the streak you have earned is safe.';
+
+  @override
+  String get formScheduleChangeToday =>
+      'The new target applies from today. The days you have already completed still count towards it.';
+
+  @override
+  String get formUnreachableTitle => 'This period is already out of reach';
+
+  @override
+  String formUnreachableWeek(int missing, int daysLeft) {
+    return 'You would need $missing more this week and only $daysLeft days are left. Saving will break the streak at the end of the week.';
+  }
+
+  @override
+  String formUnreachableMonth(int missing, int daysLeft) {
+    return 'You would need $missing more this month and only $daysLeft days are left. Saving will break the streak at the end of the month.';
+  }
+
+  @override
+  String formUnreachableYear(int missing, int daysLeft) {
+    return 'You would need $missing more this year and only $daysLeft days are left. Saving will break the streak at the end of the year.';
+  }
+
+  @override
+  String get formUnreachableConfirm => 'Save anyway';
+
+  @override
+  String get formBack => 'Go back';
+
+  @override
+  String get formArchive => 'Archive goal';
+
+  @override
+  String get formArchiveExplain =>
+      'It leaves your list but keeps its history. Nothing is deleted.';
+
+  @override
+  String get formArchiveConfirmTitle => 'Archive this goal?';
+
+  @override
+  String get formArchiveConfirm => 'Archive';
+
+  @override
+  String get formArchived => 'Goal archived.';
+
+  @override
   String get categoryHealth => 'Health';
 
   @override
