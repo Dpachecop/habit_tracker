@@ -242,7 +242,8 @@ Antes de que la app arranque hace falta el paso manual de abajo.
 - **El estado deshabilitado del check es propuesta mía, no diseño del dueño.** Ninguna captura lo
   mostraba y es una regla central (§3.5). Está resuelto en §12.3 y funcionando; falta que el dueño
   lo apruebe o pase un frame propio.
-- **Borrar `debug_seed_button.dart` cuando la fase 4 tenga el formulario.**
+- **Borrar `debug_seed_button.dart` en la fase 4**, sustituyéndolo por el botón flotante `+` que
+  abre el formulario (decisión del dueño, `ARCHITECTURE.md` §12.4).
 - **App Check sin montar.** Es lo que evita que un tercero use tus credenciales de cliente para
   crear cuentas anónimas y gastar cuota. Las reglas ya impiden que lea datos ajenos; esto es cuota,
   no confidencialidad. Vale la pena antes de publicar.

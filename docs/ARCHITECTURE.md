@@ -602,5 +602,8 @@ que la tarjeta mienta sobre a qué se comprometió el usuario.
 - **La barra inferior de 4 pestañas se construyó en la fase 3** aunque solo la primera tenga
   contenido. Cambia la geometría de todas las pantallas —padding inferior, safe areas, dónde cabe un
   botón flotante— y meterla después obligaría a re-maquetar trabajo ya cerrado.
+- **Crear una meta se hace desde un botón flotante `+` en la Home.** Decidido por el dueño el
+  2026-08-17: el `DESIGN.md` no tenía ninguna entrada al formulario y las cuatro pestañas están
+  ocupadas. Llega con la fase 4, y **reemplaza al botón temporal de sembrado**.
 - **El saludo no lleva nombre.** El diseño dice "Good morning, Alex" pero la cuenta es anónima hasta
   la fase 7. Un saludo con un hueco donde va el nombre es peor que uno sin nombre.
