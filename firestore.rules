@@ -1,0 +1,26 @@
+rules_version = '2';
+
+// Security rules for habit_tracker.
+//
+// One rule, because there is one shape of data: everything a user owns lives
+// under users/{uid}, and nothing is ever shared. Deploy with
+//   firebase deploy --only firestore:rules
+//
+// Note this also covers the anonymous accounts the app creates on first launch
+// (ARCHITECTURE.md 6.2) — an anonymous user has a real uid and is as
+// authenticated as any other, which is exactly why anonymous auth is enough to
+// start storing data on day one.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Anything outside a user's own subtree is denied by omission. Left
+    // explicit so that adding a collection later is a deliberate act.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

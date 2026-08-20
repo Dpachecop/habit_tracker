@@ -1,0 +1,11 @@
+# Localization codegen. Run implicitly by `flutter pub get` / `flutter run`,
+# or explicitly with `flutter gen-l10n`.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-dir: lib/l10n/generated
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+# Output real files under lib/ instead of a synthetic package: they are
+# committed, so a fresh clone analyzes without having to run codegen first.
+synthetic-package: false
+nullable-getter: false

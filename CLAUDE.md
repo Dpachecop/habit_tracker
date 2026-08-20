@@ -17,7 +17,13 @@ what is decided, what is next. Update it as part of the PR that closes each phas
 file is worse than none.
 
 Flutter stable 3.29.3, Dart `^3.7.2`. Platforms: **android + ios** (`web/` exists but is out of
-scope). Bundle id is still the default `com.example.habit_tracker`.
+scope). Bundle ids are still the defaults, and they differ per platform: `com.example.habit_tracker`
+on android, `com.example.habitTracker` on ios — Apple does not allow underscores. `minSdk` is 23,
+raised from Flutter's 21 because `firebase_auth` requires it.
+
+Firebase is connected (project `habit-tracker-f30b61`), but its three generated config files are
+**gitignored** — see `docs/STATUS.md` for the one command that regenerates them on a new machine.
+`flutter analyze` and `flutter test` do not need them; only a device build does.
 
 ## Architecture
 
@@ -79,6 +85,9 @@ exceptions.** That file is the source of truth; the notes below only add what it
   `docs/commit-rules`.
 - `flutter analyze` must be clean before any commit.
 - Domain logic is covered by pure unit tests — no widget test harness needed for `domain/`.
+- **Never hard-code user-facing text.** Every string the user reads lives in `lib/l10n/app_en.arb`
+  and `lib/l10n/app_es.arb`, and reaches the screen through `context.l10n`. Domain→text mappings
+  (failure codes, category names) belong in `lib/presentation/l10n/`. See `ARCHITECTURE.md` §11.
 
 ## Commands
 
@@ -89,6 +98,7 @@ flutter analyze                  # lint + type check (flutter_lints)
 dart format lib test
 flutter test
 flutter test test/domain/services/streak_calculator_test.dart --plain-name 'breaks on missed day'
+flutter gen-l10n                 # after editing any lib/l10n/*.arb (pub get also runs it)
 dart run build_runner build --delete-conflicting-outputs   # once freezed is added
 flutter build apk | ipa
 flutter clean                    # when build/ or .dart_tool/ state goes stale

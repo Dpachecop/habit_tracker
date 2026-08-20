@@ -1,0 +1,120 @@
+{
+  "@@locale": "es",
+
+  "appTitle": "Habit Tracker",
+  "homeTitle": "Metas",
+  "homeEmpty": "Todavía no tienes metas.",
+
+  "errorNetwork": "Sin conexión. Tus cambios se sincronizarán cuando vuelvas a tener red.",
+  "errorNotFound": "No encontramos eso.",
+  "errorPermission": "No tienes acceso a eso.",
+  "errorCache": "No se pudieron leer los datos guardados en este dispositivo.",
+  "errorUnknown": "Algo salió mal.",
+
+  "errorCompletionArchived": "Esta meta está archivada.",
+  "errorCompletionOutsideRange": "Ese día queda fuera del rango de fechas de la meta.",
+  "errorCompletionFutureDate": "No puedes marcar un día que todavía no ha pasado.",
+  "errorCompletionAlreadyRecorded": "Ya marcaste este día.",
+  "errorCompletionNotScheduled": "Esta meta no toca ese día.",
+  "errorCompletionQuotaReached": "Ya cumpliste el objetivo de este período.",
+
+  "checkDisabledNotToday": "Hoy no toca",
+  "quotaProgressWeek": "{completed}/{target} esta semana",
+  "quotaProgressMonth": "{completed}/{target} este mes",
+  "quotaProgressYear": "{completed}/{target} este año",
+
+  "homeGreetingMorning": "Buenos días.",
+  "homeGreetingAfternoon": "Buenas tardes.",
+  "homeGreetingEvening": "Buenas noches.",
+
+  "homeHabitsLeft": "{count, plural, =0{No te queda nada para hoy. Bien hecho.} =1{Te queda 1 meta por cumplir hoy.} other{Te quedan {count} metas por cumplir hoy.}}",
+  "homeNothingDueToday": "Hoy no toca ninguna meta.",
+  "homeEmptyHint": "Crea tu primera meta para empezar una racha.",
+
+  "streakDays": "{count, plural, =1{1 día de racha} other{{count} días de racha}}",
+  "streakNone": "Sin racha todavía",
+
+  "scheduleDaily": "Diaria",
+  "scheduleTimesPerWeek": "{times, plural, =1{Una vez por semana} =2{Dos veces por semana} other{{times} veces por semana}}",
+  "scheduleTimesPerMonth": "{times, plural, =1{Una vez al mes} =2{Dos veces al mes} other{{times} veces al mes}}",
+  "scheduleTimesPerYear": "{times, plural, =1{Una vez al año} =2{Dos veces al año} other{{times} veces al año}}",
+
+  "navHome": "Inicio",
+  "navAnalytics": "Analítica",
+  "navSettings": "Ajustes",
+  "navProfile": "Perfil",
+  "comingSoon": "Muy pronto.",
+
+  "formTitleCreate": "Nueva meta",
+  "formTitleEdit": "Editar meta",
+  "formSave": "Guardar",
+  "formSavedCreate": "Meta creada.",
+  "formSavedEdit": "Cambios guardados.",
+
+  "formNameLabel": "Nombre",
+  "formNameHint": "Meditar en la mañana",
+  "formNameRequired": "Ponle un nombre a tu meta.",
+  "formCategoryLabel": "Categoría",
+  "formColorLabel": "Color",
+
+  "formScheduleLabel": "Con qué frecuencia",
+  "formScheduleModeWeekdays": "Días concretos",
+  "formScheduleModeTimes": "Un número de veces",
+  "formWeekdaysRequired": "Elige al menos un día.",
+  "formEveryDay": "Todos los días",
+  "formTimesLabel": "Veces",
+  "formPeriodLabel": "Por",
+  "formPeriodWeek": "Semana",
+  "formPeriodMonth": "Mes",
+  "formPeriodYear": "Año",
+  "formTimesTooMany": "Máximo {max} — un día solo se puede cumplir una vez.",
+
+  "formTimeWindowLabel": "Franja del día",
+  "formAllDay": "Todo el día",
+  "formTimeFrom": "Desde",
+  "formTimeTo": "Hasta",
+  "formTimeWindowInvalid": "El fin tiene que ser después del inicio.",
+
+  "formDatesLabel": "Fechas",
+  "formStartDate": "Empieza",
+  "formEndDate": "Termina",
+  "formNoEndDate": "Sin fecha de fin",
+  "formEndBeforeStart": "El fin no puede ser antes del inicio.",
+
+  "formScheduleChangeTomorrow": "Los días nuevos aplican desde mañana. Todo hasta hoy conserva el horario anterior, así que la racha que ya ganaste está a salvo.",
+  "formScheduleChangeToday": "El objetivo nuevo aplica desde hoy. Los días que ya cumpliste siguen contando para él.",
+
+  "formUnreachableTitle": "Este período ya no se alcanza",
+  "formUnreachableWeek": "Te faltarían {missing} esta semana y solo quedan {daysLeft} días. Si guardas, la racha se corta al terminar la semana.",
+  "formUnreachableMonth": "Te faltarían {missing} este mes y solo quedan {daysLeft} días. Si guardas, la racha se corta al terminar el mes.",
+  "formUnreachableYear": "Te faltarían {missing} este año y solo quedan {daysLeft} días. Si guardas, la racha se corta al terminar el año.",
+  "formUnreachableConfirm": "Guardar de todos modos",
+  "formBack": "Volver",
+
+  "formArchive": "Archivar meta",
+  "formArchiveExplain": "Sale de tu lista pero conserva su historial. No se borra nada.",
+  "formArchiveConfirmTitle": "¿Archivar esta meta?",
+  "formArchiveConfirm": "Archivar",
+  "formArchived": "Meta archivada.",
+
+  "heatmapSummary": "Últimos {days} días, {completed} cumplidos.",
+
+  "detailTitle": "Meta",
+  "detailEdit": "Editar",
+  "detailClose": "Cerrar",
+  "detailPreviousMonth": "Mes anterior",
+  "detailNextMonth": "Mes siguiente",
+  "detailStreakChip": "{count, plural, =0{Sin racha} =1{1 día} other{{count} días}}",
+  "detailLongestStreak": "Mejor: {count}",
+
+  "categoryHealth": "Salud",
+  "categoryFitness": "Ejercicio",
+  "categoryMind": "Mente",
+  "categoryLearning": "Aprendizaje",
+  "categoryWork": "Trabajo",
+  "categoryFinance": "Finanzas",
+  "categorySocial": "Social",
+  "categoryHome": "Hogar",
+  "categoryCreativity": "Creatividad",
+  "categoryOther": "Otros"
+}

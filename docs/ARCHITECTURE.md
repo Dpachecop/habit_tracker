@@ -403,6 +403,18 @@ match /users/{uid}/{document=**} {
 }
 ```
 
+Las reglas viven en `firestore.rules` y los índices compuestos en `firestore.indexes.json`, ambos
+en la raíz del proyecto y versionados. Se despliegan con
+`firebase deploy --only firestore:rules,firestore:indexes`.
+
+**El índice `(habitId, date)` no es una optimización**: Firestore rechaza directamente una consulta
+que combine igualdad en `habitId` con rango en `date` si no existe, así que sin él los reportes no
+funcionan.
+
+Las rutas se construyen en un único sitio — `infrastructure/datasources/firestore_paths.dart` —
+porque tienen que coincidir exactamente con las reglas de arriba. Un segmento distinto no da datos
+incorrectos: da `permission-denied` en producción y en ningún otro lado.
+
 ---
 
 ## 7. Blocs
@@ -451,6 +463,7 @@ cupo del período agotado. La `HabitCard` usa ese dato para deshabilitar el chec
 
 - **Comentarios en inglés en toda clase y función**, con dartdoc `///`. Explican el *porqué*,
   no reescriben la firma.
+- **Ningún texto de usuario escrito en el código**: va en los `.arb`, en los dos idiomas. Ver §11.
 - Conventional commits, solo cuatro tipos: `feat`, `fix`, `docs`, `refactor`.
 - **Commits cortos.** Una línea de asunto y ya. Sin cuerpo salvo que haya un *porqué* que el
   código no puede contar, y en ese caso una o dos líneas, nunca párrafos.
@@ -479,3 +492,215 @@ Cada fase = una rama = un PR.
 
 La fase 1 es deliberadamente lo primero: si el motor de rachas está bien y probado, todo lo demás
 es pintar datos. Si está mal, la app entera miente.
+
+---
+
+## 11. Idiomas
+
+La app se entrega en **español e inglés**. No es una traducción que se añade al final: es una
+restricción de arquitectura, porque decide dónde puede vivir el texto.
+
+### 11.1 La regla
+
+**Ningún string visible para el usuario se escribe en el código.** Vive en `lib/l10n/*.arb`, en
+los dos idiomas, y llega a pantalla por la clase generada `AppLocalizations`.
+
+Esto no es una preferencia de estilo: es lo que hace posible que `Failure` lleve solo un `code`
+(§5) y que el dominio no sepa de idiomas. Si un widget escribe `Text('Hoy no toca')`, la regla se
+rompió en los dos sentidos — el texto quedó fuera del catálogo y el idioma se coló en la UI.
+
+### 11.2 Dónde vive cada pieza
+
+```
+lib/l10n/
+├── app_en.arb            # plantilla: las claves y sus descripciones, en inglés
+├── app_es.arb            # traducción
+└── generated/            # AppLocalizations — generado, versionado en git
+lib/config/l10n/
+└── app_locales.dart      # qué idiomas ofrece la app y en qué orden, + delegates
+lib/presentation/l10n/
+├── l10n_extensions.dart  # context.l10n
+├── failure_messages.dart # FailureCode → frase. La otra mitad de §5
+└── domain_labels.dart    # HabitCategory → etiqueta, cupo de período → "2/3 esta semana"
+```
+
+Los mapeos `dominio → texto` son de **presentación**, nunca del dominio. El dominio nombra sus
+valores con identificadores en inglés y no sabe cómo se muestran.
+
+La plantilla es la inglesa porque las claves y sus descripciones son código, y el código va en
+inglés (§9). El **fallback en tiempo de ejecución sí es español**: `AppLocales.supported` va
+ordenado `[es, en]`, y Flutter toma el primero cuando el dispositivo no habla ninguno. El orden es
+una decisión, no el resultado alfabético.
+
+### 11.3 Qué está probado
+
+`test/presentation/l10n/translations_test.dart` convierte en build roja los tres fallos silenciosos
+de un módulo de idiomas:
+
+- una clave que existe en un `.arb` y no en el otro;
+- un `FailureCode` o una `HabitCategory` sin frase propia — se comprueba que sean **distintas**,
+  porque una clave olvidada cae al mensaje genérico y eso, sin este test, no se nota;
+- un idioma declarado en `AppLocales` que no tiene traducciones, o al revés.
+
+### 11.4 Pendiente
+
+El idioma **sigue al del dispositivo**. El selector manual llega con la pantalla de ajustes, que es
+donde además habrá dónde persistir la elección; montar hoy un `LocaleCubit` sin UI ni persistencia
+sería código muerto.
+
+---
+
+## 12. Diseño visual
+
+El sistema visual es **Serene Habit**, definido por el dueño en `docs/design/DESIGN.md` con capturas
+en `docs/design/screens/`. Inter, base de 4px, márgenes de 20, esquinas de 16, sombras ambientales.
+Los tokens se traducen a código en `config/theme/` y **no se re-inventan en los widgets**: un padding
+de 13px es un widget que se salió de la grilla.
+
+### 12.1 Dos paletas que no se mezclan
+
+| Paleta | Qué viste | Dónde vive |
+|---|---|---|
+| **Marca** — verde, azul, ámbar | El chrome: cabecera, barra inferior, botones, la llama de la racha | `AppColors` |
+| **Metas** — los 8 slots | La identidad de cada meta: espina de la tarjeta, badge del icono, relleno del check | `HabitPalette` |
+
+Están separadas a propósito. Si fueran una sola, la app no podría distinguir "esto es un botón" de
+"esta es la meta de meditar". El dueño decidió el 2026-08-17 que **el color lo elige el usuario**
+(los 8 slots), no la categoría — el `DESIGN.md` proponía derivarlo de la categoría, pero eso dejaba
+siete categorías sin color y mataba `HabitColorSlot`.
+
+Los 8 slots se **revalidaron** contra las superficies nuevas y siguen pasando; ver la tabla en
+`HabitPalette`. El modo oscuro se derivó de los tokens `inverse-*` y `*-fixed-dim` que el propio
+documento trae, no se inventó.
+
+### 12.2 El icono sale de la categoría
+
+`CategoryIcons` mapea las 10 categorías a glifos. Sin campo nuevo en `Habit` y sin selector en el
+formulario. El precio es que es tosco: una meta llamada "Tomar agua" archivada en Salud recibe un
+corazón, no una gota. Si eso molesta, un `icon` nullable en `Habit` que sobreescriba el mapa es un
+cambio aditivo.
+
+### 12.3 El estado que el diseño no tenía
+
+Ninguna captura muestra un check deshabilitado, y esa es una regla central de la app (§3.5). Se
+resolvió así, y está pendiente de que el dueño lo apruebe o lo reemplace por un frame propio:
+
+- **Hoy no toca** → caja con borde tenue, no tocable, y el renglón de la racha dice "Hoy no toca".
+- **Cupo lleno** → igual, con "3/3 esta semana".
+- **Completada hoy** → caja rellena con el color de la meta, nombre tachado, y **sigue siendo
+  tocable** para deshacer. Bloquear el deshacer dejaría al usuario sin forma de corregir un toque
+  accidental.
+
+El renglón bajo el nombre describe el **horario**, y distingue los dos modos porque no son lo mismo:
+`TimesPerPeriod` da "3 veces por semana", `SpecificWeekdays` da "Lun, Mié, Sáb". Confundirlos haría
+que la tarjeta mienta sobre a qué se comprometió el usuario.
+
+### 12.4 Alcance
+
+- **El heatmap por tarjeta se hizo en la fase 5.** Ver §12.5.
+- **La barra inferior de 4 pestañas se construyó en la fase 3** aunque solo la primera tenga
+  contenido. Cambia la geometría de todas las pantallas —padding inferior, safe areas, dónde cabe un
+  botón flotante— y meterla después obligaría a re-maquetar trabajo ya cerrado.
+- **Crear una meta se hace desde un botón flotante `+` en la Home.** Decidido por el dueño el
+  2026-08-17: el `DESIGN.md` no tenía ninguna entrada al formulario y las cuatro pestañas están
+  ocupadas. Implementado en la fase 4; **tocar una tarjeta** abre esa misma pantalla en modo
+  edición.
+- **No hay fecha en la cabecera.** Estaba en las capturas; el dueño la quitó el 2026-08-17.
+- **El saludo no lleva nombre.** El diseño dice "Good morning, Alex" pero la cuenta es anónima hasta
+  la fase 7. Un saludo con un hueco donde va el nombre es peor que uno sin nombre.
+
+### 12.5 La cuadrícula de días
+
+Va **dentro de cada tarjeta**, no como widget aparte bajo la lista: así lo puso el dueño en el
+diseño y así se construyó.
+
+**Cuatro filas leídas de izquierda a derecha**, es decir "los últimos N días" y no un calendario.
+El dueño lo eligió así el 2026-08-17 frente a la alternativa estilo GitHub de siete filas, donde
+una columna es una semana y se puede leer por patrón ("los martes fallo"). La forma de cuatro filas
+es más compacta y calca el Figma; el precio es que **una columna no significa nada**, y por eso la
+cuadrícula no lleva ninguna etiqueta: rotularla insinuaría una estructura que no tiene.
+
+Cuántas columnas caben es una pregunta sobre el ancho, así que la responde el widget. El bloc le
+entrega una cola larga de estados —240 días— y la tarjeta pinta los últimos que le caben.
+
+### 12.6 Tres estados, no dos
+
+Los tres tonos del diseño coinciden con algo que sí existe en el dominio, y `DayStatus` los nombra:
+
+| Estado | Cuándo | Cómo se pinta |
+|---|---|---|
+| `completed` | Hay entrada | El color de la meta |
+| `missed` | Tocaba, ya pasó, y no se cumplió | Gris neutro, visible |
+| `notDue` | No tocaba, fuera de rango, futuro, u **hoy mientras siga abierto** | Casi transparente |
+
+La distinción no es cosmética. En una meta de lunes/miércoles/sábado **los martes no son fallos**, y
+pintarlos igual que un fallo mentiría sobre la constancia del usuario — que es justo lo único que la
+cuadrícula existe para mostrar.
+
+Dos consecuencias que se siguen de las reglas ya establecidas:
+
+- **Una meta de N veces por período no tiene días fallados.** Si te pusiste 3 a la semana, los
+  cuatro días que no fuiste no son cuatro fracasos: quedarse corto es un hecho de *la semana*, y la
+  semana no es una celda. Solo se pintan los días cumplidos.
+- **Un fallo se pinta gris, no con el color de la meta desvaído.** Un color lavado se lee como
+  "a medias", y en esta app nada está a medias.
+
+El estado de un día usa `habit.scheduleOn(fecha)`, no el horario actual, por lo mismo de siempre: un
+día cumplido bajo las reglas de entonces sigue cumplido, y un cambio de horario no reescribe la
+cuadrícula hacia atrás.
+
+### 12.7 La pantalla de detalle
+
+Pedida por el dueño el 2026-08-20, fuera del roadmap. Diseño en
+`docs/design/screens/details_goal.jpeg`. Se abre **al tocar una tarjeta**.
+
+Eso cambia la navegación, y para mejor: hasta ahora tocar una meta te llevaba directo al
+formulario, así que no había forma de *mirar* una meta sin quedar en posición de cambiarla. Ahora:
+
+| Ruta | Qué es |
+|---|---|
+| `/habit/new` | Crear |
+| `/habit/:id` | Ver — la pantalla de detalle |
+| `/habit/:id/edit` | Editar, como subruta de la anterior |
+
+Editar pasó a ser una acción **dentro** del detalle. La jerarquía de rutas dice lo mismo que la
+interfaz: la meta es la cosa, y editarla es algo que le haces.
+
+#### Dos rejillas, y por qué son widgets distintos
+
+`ContributionGrid` es **estilo GitHub de verdad**: siete filas, una por día de la semana, y una
+columna por semana ISO. Por eso sí lleva etiquetas de mes arriba y de día al costado — se puede leer
+por patrón, y una fila de martes vacía dice algo que una tira plana no puede decir.
+
+`HabitHeatmap`, el de la tarjeta, tiene cuatro filas en orden de lectura y **no lleva ninguna
+etiqueta**, porque rotularlo insinuaría una estructura que no tiene (§12.5).
+
+No son el mismo widget con un parámetro: son dos formas de mostrar lo mismo con propiedades
+distintas. Fusionarlos habría significado un widget con dos modos que no comparten ni el layout ni
+la semántica.
+
+Cuántas columnas caben lo decide el ancho. El dueño eligió "los meses que quepan, sin scroll" sobre
+un año con scroll horizontal: ningún gesto escondido, a cambio de no ver el año completo.
+
+#### El calendario mensual
+
+Solo lectura, por decisión del dueño. Hoy va con un anillo, los días cumplidos con un punto del
+color de la meta —no rellenando la celda, porque el número tiene que seguir legible y tres slots
+claros de la paleta no soportan texto oscuro encima—, y los días de los meses vecinos se muestran en
+gris para que las filas sean semanas completas.
+
+Siempre **seis filas**, aunque a febrero le sobren. Una rejilla que cambia de alto haría saltar la
+pantalla entera al pasar de mes.
+
+El dominio ya permitiría marcar un día pasado —solo el futuro está prohibido—, así que volverlo
+tocable es un cambio aditivo el día que se quiera: no habría que deshacer nada.
+
+#### La lectura es completa, no una ventana
+
+`HabitDetailCubit` lee **todas** las entradas de esa meta, sin ventana, al revés que la Home. Son
+tres razones: es una sola meta y no todas, se abre a propósito y no en cada arranque, y las flechas
+de mes pueden ir a cualquier mes — con una ventana el calendario se quedaría en blanco pasado un
+borde invisible.
+
+Consecuencia útil: **la racha máxima que muestra esta pantalla es la de verdad**, no la recortada
+por los 400 días de la Home.

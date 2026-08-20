@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
-import 'habit_palette.dart';
-import '../../domain/entities/habit_color_slot.dart';
+import 'app_dimens.dart';
+import 'app_typography.dart';
 
-/// Builds the app's light and dark themes.
+/// Builds the app's light and dark themes from the *Serene Habit* tokens.
 ///
-/// Both are derived from the same neutral tokens in [AppColors] so the two
-/// modes stay structurally identical and only the surfaces swap. The seed color
-/// is the first habit palette slot, which keeps Material's generated accents in
-/// the same family as the habit colors instead of clashing with them.
+/// Both modes come out of one private builder so a token added to one cannot be
+/// forgotten in the other — the commonest way two themes drift into looking
+/// like two different apps.
+///
+/// The color scheme is written out slot by slot rather than generated with
+/// `ColorScheme.fromSeed`. Seeding would let Material invent its own steps and
+/// quietly override the design's, which defeats having a token file at all.
 abstract final class AppTheme {
   /// The theme used when the device is in light mode.
   static ThemeData get light => _build(Brightness.light);
@@ -18,70 +21,222 @@ abstract final class AppTheme {
   static ThemeData get dark => _build(Brightness.dark);
 
   /// Assembles a theme for the given [brightness].
-  ///
-  /// Kept private and shared so a token added to one mode cannot be forgotten
-  /// in the other — the commonest way themes drift apart.
   static ThemeData _build(Brightness brightness) {
     final bool isDark = brightness == Brightness.dark;
-
-    final ColorScheme scheme = ColorScheme.fromSeed(
-      seedColor: HabitPalette.of(HabitColorSlot.blue, brightness),
-      brightness: brightness,
-    ).copyWith(
-      surface: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-    );
-
-    final Color textPrimary =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final Color textSecondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final ColorScheme scheme = isDark ? _darkScheme : _lightScheme;
+    final Color ink = scheme.onSurface;
 
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
       colorScheme: scheme,
+      fontFamily: AppTypography.fontFamily,
       scaffoldBackgroundColor:
           isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      dividerColor: isDark ? AppColors.darkGridline : AppColors.lightGridline,
+      dividerColor: scheme.outlineVariant,
+      textTheme: AppTypography.build(ink),
+
       appBarTheme: AppBarTheme(
         backgroundColor:
             isDark ? AppColors.darkBackground : AppColors.lightBackground,
-        foregroundColor: textPrimary,
+        foregroundColor: scheme.primary,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
-        centerTitle: false,
+        centerTitle: true,
+        titleTextStyle: AppTypography.build(scheme.primary).displaySmall,
       ),
+
+      // Cards carry the design's ambient shadow rather than a border: the plane
+      // behind them is tinted and they are white, so the depth reads without an
+      // outline. Flutter needs `shadowColor` plus `elevation` for this, and the
+      // exact blur from the design is applied by the card widget itself, which
+      // can use a BoxShadow.
       cardTheme: CardThemeData(
-        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        color: scheme.surface,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          // A hairline ring instead of a shadow: cards sit on a plane that is
-          // only slightly different, so an outline separates them more
-          // honestly than elevation does.
-          side: BorderSide(
-            color: isDark ? AppColors.darkGridline : AppColors.lightGridline,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+        ),
+      ),
+
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: scheme.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        height: 72,
+        indicatorColor: scheme.primary,
+        indicatorShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        iconTheme: WidgetStateProperty.resolveWith((Set<WidgetState> states) {
+          final bool selected = states.contains(WidgetState.selected);
+          return IconThemeData(
+            size: 22,
+            color: selected ? scheme.onPrimary : scheme.onSurfaceVariant,
+          );
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((
+          Set<WidgetState> states,
+        ) {
+          final bool selected = states.contains(WidgetState.selected);
+          return AppTypography.build(
+            selected ? scheme.onSurface : scheme.onSurfaceVariant,
+          ).labelMedium!;
+        }),
+      ),
+
+      // `Size(64, 48)`, never `Size.fromHeight`. fromHeight sets the width to
+      // infinity, which is harmless for a button that fills its row and fatal
+      // for one sitting next to something else — it forces an infinite width
+      // constraint and the whole subtree fails to lay out. Buttons that should
+      // span the screen are wrapped in a full-width box at the call site.
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size(64, AppSpacing.minTapTarget),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md),
           ),
         ),
       ),
-      textTheme: _baseTypography(
-        isDark,
-      ).apply(bodyColor: textPrimary, displayColor: textPrimary),
-      listTileTheme: ListTileThemeData(
-        textColor: textPrimary,
-        subtitleTextStyle: TextStyle(color: textSecondary, fontSize: 13),
+
+      // Ghost style with a 1px accent border, per the design's secondary button.
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(64, AppSpacing.minTapTarget),
+          side: BorderSide(color: scheme.primary),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+        ),
+      ),
+
+      // Material fills the selected segment with `secondaryContainer`, which
+      // here is a blue that fights every other selected control on the same
+      // screen. Selection is green throughout, so this says so explicitly.
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (Set<WidgetState> states) =>
+                states.contains(WidgetState.selected)
+                    ? scheme.primary
+                    : Colors.transparent,
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (Set<WidgetState> states) =>
+                states.contains(WidgetState.selected)
+                    ? scheme.onPrimary
+                    : scheme.onSurfaceVariant,
+          ),
+          side: WidgetStatePropertyAll<BorderSide>(
+            BorderSide(color: scheme.outlineVariant),
+          ),
+        ),
+      ),
+
+      // Pill-shaped, low-saturation background — the frequency chip.
+      chipTheme: ChipThemeData(
+        backgroundColor:
+            isDark
+                ? AppColors.darkSurfaceContainer
+                : AppColors.lightSurfaceContainer,
+        side: BorderSide.none,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.full),
+        ),
+        labelStyle: AppTypography.build(scheme.onSurfaceVariant).labelMedium!,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
+        ),
+      ),
+
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor:
+            isDark
+                ? AppColors.darkSurfaceContainerHigh
+                : AppColors.lightOnSurface,
+        contentTextStyle:
+            AppTypography.build(
+              isDark ? AppColors.darkOnSurface : AppColors.lightBackground,
+            ).bodyMedium,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
       ),
     );
   }
 
-  /// Picks the Material text theme whose default ink suits [isDark].
+  /// Light slots, straight from the token file.
+  static const ColorScheme _lightScheme = ColorScheme(
+    brightness: Brightness.light,
+    primary: AppColors.lightPrimary,
+    onPrimary: AppColors.lightOnPrimary,
+    primaryContainer: AppColors.lightPrimaryContainer,
+    onPrimaryContainer: AppColors.lightOnPrimaryContainer,
+    secondary: AppColors.lightSecondary,
+    onSecondary: AppColors.lightOnSecondary,
+    tertiary: AppColors.lightTertiary,
+    onTertiary: AppColors.lightOnTertiary,
+    tertiaryContainer: AppColors.lightTertiaryContainer,
+    error: AppColors.lightError,
+    onError: AppColors.lightOnError,
+    errorContainer: AppColors.lightErrorContainer,
+    onErrorContainer: AppColors.lightOnErrorContainer,
+    surface: AppColors.lightSurface,
+    onSurface: AppColors.lightOnSurface,
+    surfaceContainerLow: AppColors.lightSurfaceContainerLow,
+    surfaceContainer: AppColors.lightSurfaceContainer,
+    surfaceContainerHigh: AppColors.lightSurfaceContainerHigh,
+    onSurfaceVariant: AppColors.lightOnSurfaceVariant,
+    outline: AppColors.lightOutline,
+    outlineVariant: AppColors.lightOutlineVariant,
+  );
+
+  /// Dark slots, derived as documented in [AppColors].
+  static const ColorScheme _darkScheme = ColorScheme(
+    brightness: Brightness.dark,
+    primary: AppColors.darkPrimary,
+    onPrimary: AppColors.darkOnPrimary,
+    primaryContainer: AppColors.darkPrimaryContainer,
+    onPrimaryContainer: AppColors.darkOnPrimaryContainer,
+    secondary: AppColors.darkSecondary,
+    onSecondary: AppColors.darkOnSecondary,
+    tertiary: AppColors.darkTertiary,
+    onTertiary: AppColors.darkOnTertiary,
+    tertiaryContainer: AppColors.darkTertiaryContainer,
+    error: AppColors.darkError,
+    onError: AppColors.darkOnError,
+    errorContainer: AppColors.darkErrorContainer,
+    onErrorContainer: AppColors.darkOnErrorContainer,
+    surface: AppColors.darkSurface,
+    onSurface: AppColors.darkOnSurface,
+    surfaceContainerLow: AppColors.darkSurfaceContainerLow,
+    surfaceContainer: AppColors.darkSurfaceContainer,
+    surfaceContainerHigh: AppColors.darkSurfaceContainerHigh,
+    onSurfaceVariant: AppColors.darkOnSurfaceVariant,
+    outline: AppColors.darkOutline,
+    outlineVariant: AppColors.darkOutlineVariant,
+  );
+
+  /// The card shadow from the design's elevation level 1.
   ///
-  /// The colors are overridden right after, but starting from the matching
-  /// variant means anything not explicitly re-colored still lands readable.
-  static TextTheme _baseTypography(bool isDark) {
-    final Typography typography = Typography.material2021(
-      platform: TargetPlatform.iOS,
-    );
-    return isDark ? typography.white : typography.black;
+  /// Returned as a list so a widget can hand it straight to a `BoxDecoration`.
+  /// Suppressed in dark mode: a black shadow on a dark plane is invisible, and
+  /// separation there comes from the surface being lighter than the background.
+  static List<BoxShadow> cardShadow(Brightness brightness) {
+    if (brightness == Brightness.dark) return const <BoxShadow>[];
+    return <BoxShadow>[
+      BoxShadow(
+        color: const Color(
+          0xFF000000,
+        ).withValues(alpha: AppElevation.cardOpacity),
+        blurRadius: AppElevation.cardBlur,
+        offset: const Offset(0, AppElevation.cardOffsetY),
+      ),
+    ];
   }
 }
