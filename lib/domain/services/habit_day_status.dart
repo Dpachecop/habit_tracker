@@ -54,27 +54,62 @@ abstract final class HabitDayStatuses {
 
   /// One status per day for the [length] days ending on [today], oldest first.
   ///
-  /// Oldest first because that is reading order, which is how the grid is laid
-  /// out: the last cell is today.
+  /// Oldest first because that is reading order, which is how the card's strip
+  /// is laid out: the last cell is today.
   static List<DayStatus> lastDays({
     required Habit habit,
     required Iterable<HabitEntry> entries,
     required DateOnly today,
     required int length,
+  }) => between(
+    habit: habit,
+    entries: entries,
+    from: today.addDays(-(length - 1)),
+    to: today,
+    today: today,
+  );
+
+  /// One status per day from [from] to [to], both inclusive, oldest first.
+  ///
+  /// The general form. The detail screen needs it because its grids start on
+  /// calendar boundaries — a Monday for the week columns, the first of the
+  /// month for the month view — rather than "N days back from now".
+  ///
+  /// Returns an empty list when [to] precedes [from], which is what a caller
+  /// asking about an inverted range deserves rather than a crash.
+  static List<DayStatus> between({
+    required Habit habit,
+    required Iterable<HabitEntry> entries,
+    required DateOnly from,
+    required DateOnly to,
+    required DateOnly today,
   }) {
-    final Set<DateOnly> completed = <DateOnly>{
-      for (final HabitEntry entry in entries)
-        if (entry.habitId == habit.id) entry.date,
-    };
+    if (to < from) return const <DayStatus>[];
+
+    final Set<DateOnly> completed = completedDaysOf(habit, entries);
+    final int days = from.daysUntil(to) + 1;
 
     return <DayStatus>[
-      for (int back = length - 1; back >= 0; back--)
+      for (int offset = 0; offset < days; offset++)
         on(
           habit: habit,
           completedDays: completed,
-          date: today.addDays(-back),
+          date: from.addDays(offset),
           today: today,
         ),
     ];
   }
+
+  /// The days [habit] was completed on, out of a mixed pile of entries.
+  ///
+  /// Exposed because callers that ask about several ranges — the detail screen
+  /// draws two grids over the same history — should filter once rather than
+  /// per range.
+  static Set<DateOnly> completedDaysOf(
+    Habit habit,
+    Iterable<HabitEntry> entries,
+  ) => <DateOnly>{
+    for (final HabitEntry entry in entries)
+      if (entry.habitId == habit.id) entry.date,
+  };
 }

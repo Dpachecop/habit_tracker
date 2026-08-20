@@ -575,6 +575,48 @@ abstract class AppLocalizations {
   /// **'Last {days} days, {completed} completed.'**
   String heatmapSummary(int days, int completed);
 
+  /// Fallback app bar title on the habit detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal'**
+  String get detailTitle;
+
+  /// Opens the form from the detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get detailEdit;
+
+  /// Dismisses the habit detail screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get detailClose;
+
+  /// Calendar navigation, for screen readers.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous month'**
+  String get detailPreviousMonth;
+
+  /// Calendar navigation, for screen readers.
+  ///
+  /// In en, this message translates to:
+  /// **'Next month'**
+  String get detailNextMonth;
+
+  /// Streak chip beside the schedule chip. Short because it sits next to a flame icon.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No streak} =1{1 day} other{{count} days}}'**
+  String detailStreakChip(int count);
+
+  /// Longest run ever. Unlike the home screen's, this one is computed over the full history rather than a window.
+  ///
+  /// In en, this message translates to:
+  /// **'Best: {count}'**
+  String detailLongestStreak(int count);
+
   /// HabitCategory.health
   ///
   /// In en, this message translates to:

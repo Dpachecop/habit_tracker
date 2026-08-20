@@ -648,3 +648,59 @@ Dos consecuencias que se siguen de las reglas ya establecidas:
 El estado de un día usa `habit.scheduleOn(fecha)`, no el horario actual, por lo mismo de siempre: un
 día cumplido bajo las reglas de entonces sigue cumplido, y un cambio de horario no reescribe la
 cuadrícula hacia atrás.
+
+### 12.7 La pantalla de detalle
+
+Pedida por el dueño el 2026-08-20, fuera del roadmap. Diseño en
+`docs/design/screens/details_goal.jpeg`. Se abre **al tocar una tarjeta**.
+
+Eso cambia la navegación, y para mejor: hasta ahora tocar una meta te llevaba directo al
+formulario, así que no había forma de *mirar* una meta sin quedar en posición de cambiarla. Ahora:
+
+| Ruta | Qué es |
+|---|---|
+| `/habit/new` | Crear |
+| `/habit/:id` | Ver — la pantalla de detalle |
+| `/habit/:id/edit` | Editar, como subruta de la anterior |
+
+Editar pasó a ser una acción **dentro** del detalle. La jerarquía de rutas dice lo mismo que la
+interfaz: la meta es la cosa, y editarla es algo que le haces.
+
+#### Dos rejillas, y por qué son widgets distintos
+
+`ContributionGrid` es **estilo GitHub de verdad**: siete filas, una por día de la semana, y una
+columna por semana ISO. Por eso sí lleva etiquetas de mes arriba y de día al costado — se puede leer
+por patrón, y una fila de martes vacía dice algo que una tira plana no puede decir.
+
+`HabitHeatmap`, el de la tarjeta, tiene cuatro filas en orden de lectura y **no lleva ninguna
+etiqueta**, porque rotularlo insinuaría una estructura que no tiene (§12.5).
+
+No son el mismo widget con un parámetro: son dos formas de mostrar lo mismo con propiedades
+distintas. Fusionarlos habría significado un widget con dos modos que no comparten ni el layout ni
+la semántica.
+
+Cuántas columnas caben lo decide el ancho. El dueño eligió "los meses que quepan, sin scroll" sobre
+un año con scroll horizontal: ningún gesto escondido, a cambio de no ver el año completo.
+
+#### El calendario mensual
+
+Solo lectura, por decisión del dueño. Hoy va con un anillo, los días cumplidos con un punto del
+color de la meta —no rellenando la celda, porque el número tiene que seguir legible y tres slots
+claros de la paleta no soportan texto oscuro encima—, y los días de los meses vecinos se muestran en
+gris para que las filas sean semanas completas.
+
+Siempre **seis filas**, aunque a febrero le sobren. Una rejilla que cambia de alto haría saltar la
+pantalla entera al pasar de mes.
+
+El dominio ya permitiría marcar un día pasado —solo el futuro está prohibido—, así que volverlo
+tocable es un cambio aditivo el día que se quiera: no habría que deshacer nada.
+
+#### La lectura es completa, no una ventana
+
+`HabitDetailCubit` lee **todas** las entradas de esa meta, sin ventana, al revés que la Home. Son
+tres razones: es una sola meta y no todas, se abre a propósito y no en cada arranque, y las flechas
+de mes pueden ir a cualquier mes — con una ventana el calendario se quedaría en blanco pasado un
+borde invisible.
+
+Consecuencia útil: **la racha máxima que muestra esta pantalla es la de verdad**, no la recortada
+por los 400 días de la Home.

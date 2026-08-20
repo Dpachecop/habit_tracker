@@ -42,8 +42,11 @@ class HabitFormScreen extends StatelessWidget {
   /// Route path for creating.
   static const String createPath = '/habit/new';
 
-  /// Route path for editing, with the habit id as a path parameter.
-  static const String editPath = '/habit/:habitId';
+  /// The concrete edit path for [id].
+  ///
+  /// A sub-route of the detail screen rather than a root one: `/habit/:id` is
+  /// the habit, and editing it is something you do *to* it.
+  static String editPathFor(String id) => '/habit/$id/edit';
 
   @override
   Widget build(BuildContext context) {

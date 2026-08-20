@@ -99,6 +99,14 @@
 
   "heatmapSummary": "Últimos {days} días, {completed} cumplidos.",
 
+  "detailTitle": "Meta",
+  "detailEdit": "Editar",
+  "detailClose": "Cerrar",
+  "detailPreviousMonth": "Mes anterior",
+  "detailNextMonth": "Mes siguiente",
+  "detailStreakChip": "{count, plural, =0{Sin racha} =1{1 día} other{{count} días}}",
+  "detailLongestStreak": "Mejor: {count}",
+
   "categoryHealth": "Salud",
   "categoryFitness": "Ejercicio",
   "categoryMind": "Mente",

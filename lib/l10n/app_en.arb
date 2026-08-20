@@ -280,6 +280,27 @@
     "placeholders": { "days": { "type": "int" }, "completed": { "type": "int" } }
   },
 
+  "detailTitle": "Goal",
+  "@detailTitle": { "description": "Fallback app bar title on the habit detail screen." },
+  "detailEdit": "Edit",
+  "@detailEdit": { "description": "Opens the form from the detail screen." },
+  "detailClose": "Close",
+  "@detailClose": { "description": "Dismisses the habit detail screen." },
+  "detailPreviousMonth": "Previous month",
+  "@detailPreviousMonth": { "description": "Calendar navigation, for screen readers." },
+  "detailNextMonth": "Next month",
+  "@detailNextMonth": { "description": "Calendar navigation, for screen readers." },
+  "detailStreakChip": "{count, plural, =0{No streak} =1{1 day} other{{count} days}}",
+  "@detailStreakChip": {
+    "description": "Streak chip beside the schedule chip. Short because it sits next to a flame icon.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "detailLongestStreak": "Best: {count}",
+  "@detailLongestStreak": {
+    "description": "Longest run ever. Unlike the home screen's, this one is computed over the full history rather than a window.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+
   "categoryHealth": "Health",
   "@categoryHealth": { "description": "HabitCategory.health" },
   "categoryFitness": "Fitness",
