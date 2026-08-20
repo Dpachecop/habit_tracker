@@ -63,7 +63,13 @@ exceptions.** That file is the source of truth; the notes below only add what it
 - **Keep commit messages short** — a subject line is usually the whole message. Add a body only
   for a *why* the code cannot express, and then one or two lines, never paragraphs. The project
   owner asked for this explicitly after an over-long first commit.
-- `gh` is not installed — push the branch and hand over the PR URL instead of trying to open it.
+- **`gh` is installed and authenticated. Open the PR yourself** when a phase closes — push the
+  branch and run `gh pr create`, rather than handing over a link and calling it done. Verify a
+  claim like this before acting on it: this line used to say the opposite, and six phases shipped
+  with no PRs because of it.
+- **Branches stack.** Until a phase is merged, the next one branches off it, so its PR must target
+  its parent (`gh pr create --base <parent>`) and not `main`. Based on `main`, every diff would
+  carry all the earlier phases and be unreviewable.
 - Branch names follow `<type>/<kebab-name>`: `feat/habit-form`, `fix/streak-week-boundary`,
   `docs/commit-rules`.
 - `flutter analyze` must be clean before any commit.
