@@ -1,5 +1,6 @@
 import '../../domain/entities/habit_category.dart';
 import '../../domain/entities/habit_schedule.dart';
+import '../../domain/services/habit_completion_policy.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 /// Labels for the domain enums that reach the screen.
@@ -26,6 +27,41 @@ extension DomainLabels on AppLocalizations {
     HabitCategory.creativity => categoryCreativity,
     HabitCategory.other => categoryOther,
   };
+
+  /// The short label a card shows in place of the streak when the check is
+  /// blocked.
+  ///
+  /// Deliberately not the same strings as `FailureMessages`: those are full
+  /// sentences for a snackbar after a refused tap ("This habit is not scheduled
+  /// for that day."), while a card has room for three words and is explaining a
+  /// *state*, not an error. Same domain reason, two registers.
+  String messageForBlockReason(
+    CompletionBlockReason? reason,
+    CompletionAvailability availability,
+  ) => switch (reason) {
+    CompletionBlockReason.notScheduled => checkDisabledNotToday,
+    // The one case with numbers, and the reason they travel on the verdict.
+    CompletionBlockReason.quotaReached => _quotaOrFallback(availability),
+    CompletionBlockReason.alreadyCompleted => errorCompletionAlreadyRecorded,
+    CompletionBlockReason.archived => errorCompletionArchived,
+    CompletionBlockReason.outsideRange => errorCompletionOutsideRange,
+    CompletionBlockReason.futureDate => errorCompletionFutureDate,
+    // Unreachable while the card only asks about blocked states, but a blocked
+    // verdict always has a reason and this keeps the switch total.
+    null => '',
+  };
+
+  /// "3/3 this week", falling back to the generic sentence if the verdict
+  /// somehow arrived without its counters.
+  String _quotaOrFallback(CompletionAvailability availability) {
+    final int? completed = availability.completedInPeriod;
+    final int? target = availability.periodTarget;
+    final SchedulePeriod? period = availability.period;
+    if (completed == null || target == null || period == null) {
+      return errorCompletionQuotaReached;
+    }
+    return quotaProgress(period: period, completed: completed, target: target);
+  }
 
   /// Progress within the current period, as "2/3 this week".
   ///

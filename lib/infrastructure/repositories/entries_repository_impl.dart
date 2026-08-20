@@ -31,6 +31,12 @@ final class EntriesRepositoryImpl implements EntriesRepository {
       Guard.stream(_datasource.watchEntriesOn(date));
 
   @override
+  Stream<Either<Failure, List<HabitEntry>>> watchEntries({
+    DateOnly? from,
+    DateOnly? to,
+  }) => Guard.stream(_datasource.watchEntries(from: from, to: to));
+
+  @override
   Stream<Either<Failure, List<HabitEntry>>> watchEntriesForHabit(
     String habitId, {
     DateOnly? from,

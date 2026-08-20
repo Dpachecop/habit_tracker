@@ -59,6 +59,7 @@ final class CompletionAvailability extends Equatable {
   const CompletionAvailability.allowed({
     this.completedInPeriod,
     this.periodTarget,
+    this.period,
   }) : isAllowed = true,
        reason = null;
 
@@ -67,6 +68,7 @@ final class CompletionAvailability extends Equatable {
     CompletionBlockReason this.reason, {
     this.completedInPeriod,
     this.periodTarget,
+    this.period,
   }) : isAllowed = false;
 
   /// Whether the day can be checked right now.
@@ -82,12 +84,21 @@ final class CompletionAvailability extends Equatable {
   /// highest-in-force value, not necessarily the currently configured one.
   final int? periodTarget;
 
+  /// Which calendar bucket [completedInPeriod] and [periodTarget] refer to
+  /// (mode B only).
+  ///
+  /// Travels with the counters because the three are only meaningful together:
+  /// "2/3" needs to become "2/3 this week" or "2/3 this month", and the caller
+  /// would otherwise have to reach back into the schedule to find out which.
+  final SchedulePeriod? period;
+
   @override
   List<Object?> get props => <Object?>[
     isAllowed,
     reason,
     completedInPeriod,
     periodTarget,
+    period,
   ];
 }
 
@@ -165,11 +176,13 @@ abstract final class HabitCompletionPolicy {
             CompletionBlockReason.quotaReached,
             completedInPeriod: completed,
             periodTarget: target,
+            period: schedule.period,
           );
         }
         return CompletionAvailability.allowed(
           completedInPeriod: completed,
           periodTarget: target,
+          period: schedule.period,
         );
     }
   }

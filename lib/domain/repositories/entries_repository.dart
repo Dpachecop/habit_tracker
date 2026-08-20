@@ -17,6 +17,16 @@ abstract interface class EntriesRepository {
   /// know which cards are already checked.
   Stream<Either<Failure, List<HabitEntry>>> watchEntriesOn(DateOnly date);
 
+  /// Watches every habit's entries inside a date window.
+  ///
+  /// What the home screen subscribes to: the streak of each card is derived from
+  /// history, so today's entries alone are not enough. One windowed stream for
+  /// the whole list rather than one per habit.
+  Stream<Either<Failure, List<HabitEntry>>> watchEntries({
+    DateOnly? from,
+    DateOnly? to,
+  });
+
   /// Watches one habit's entries in an optional window, for the heatmap and the
   /// reports.
   Stream<Either<Failure, List<HabitEntry>>> watchEntriesForHabit(

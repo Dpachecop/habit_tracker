@@ -37,3 +37,17 @@ flutter:
   uses-material-design: true
   # Runs gen_l10n from l10n.yaml on pub get / run.
   generate: true
+
+  # Inter, bundled rather than fetched at runtime: this app has to work with no
+  # network. Three static weights instead of the variable file, because a
+  # variable font in Flutter needs fontVariations at every call site and plain
+  # fontWeight would silently do nothing. Licence in assets/fonts/OFL.txt.
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700

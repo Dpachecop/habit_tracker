@@ -62,7 +62,8 @@ import 'app_localizations_es.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,17 +84,18 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale('es')
+    Locale('es'),
   ];
 
   /// Product name, shown in the OS task switcher.
@@ -203,6 +206,108 @@ abstract class AppLocalizations {
   /// **'{completed}/{target} this year'**
   String quotaProgressYear(int completed, int target);
 
+  /// Greeting on the home header before noon. No name: the account is anonymous until the last phase, and 'Good morning, null' is worse than no name at all.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning.'**
+  String get homeGreetingMorning;
+
+  /// Greeting between noon and 19h.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon.'**
+  String get homeGreetingAfternoon;
+
+  /// Greeting from 19h onwards.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening.'**
+  String get homeGreetingEvening;
+
+  /// Summary under the greeting. Counts only habits that are due today and still uncompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Nothing left for today. Well done.} =1{You have 1 habit left to complete today.} other{You have {count} habits left to complete today.}}'**
+  String homeHabitsLeft(int count);
+
+  /// Shown instead of the count when the user has habits but none of them fall on today.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is scheduled for today.'**
+  String get homeNothingDueToday;
+
+  /// Second line of the empty state, under homeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first goal to start a streak.'**
+  String get homeEmptyHint;
+
+  /// Streak label on a habit card. Counts completed days, not periods.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day streak} other{{count} day streak}}'**
+  String streakDays(int count);
+
+  /// Shown in place of streakDays when the current streak is zero.
+  ///
+  /// In en, this message translates to:
+  /// **'No streak yet'**
+  String get streakNone;
+
+  /// Schedule label for SpecificWeekdays covering all seven days.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get scheduleDaily;
+
+  /// Schedule label for TimesPerPeriod over a week. Distinct from a weekday list on purpose: here the user picks which days, and that is a different goal.
+  ///
+  /// In en, this message translates to:
+  /// **'{times, plural, =1{Once a week} =2{Twice a week} other{{times} times a week}}'**
+  String scheduleTimesPerWeek(int times);
+
+  /// Schedule label for TimesPerPeriod over a month.
+  ///
+  /// In en, this message translates to:
+  /// **'{times, plural, =1{Once a month} =2{Twice a month} other{{times} times a month}}'**
+  String scheduleTimesPerMonth(int times);
+
+  /// Schedule label for TimesPerPeriod over a year.
+  ///
+  /// In en, this message translates to:
+  /// **'{times, plural, =1{Once a year} =2{Twice a year} other{{times} times a year}}'**
+  String scheduleTimesPerYear(int times);
+
+  /// Bottom navigation label.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// Bottom navigation label.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get navAnalytics;
+
+  /// Bottom navigation label.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navSettings;
+
+  /// Bottom navigation label.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get navProfile;
+
+  /// Placeholder body for tabs whose phase has not been built yet.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon.'**
+  String get comingSoon;
+
   /// HabitCategory.health
   ///
   /// In en, this message translates to:
@@ -264,7 +369,8 @@ abstract class AppLocalizations {
   String get categoryOther;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -273,25 +379,26 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'es'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'es'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en': return AppLocalizationsEn();
-    case 'es': return AppLocalizationsEs();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
+    'that was used.',
   );
 }

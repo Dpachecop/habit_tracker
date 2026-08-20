@@ -547,3 +547,63 @@ de un módulo de idiomas:
 El idioma **sigue al del dispositivo**. El selector manual llega con la pantalla de ajustes, que es
 donde además habrá dónde persistir la elección; montar hoy un `LocaleCubit` sin UI ni persistencia
 sería código muerto.
+
+---
+
+## 12. Diseño visual
+
+El sistema visual es **Serene Habit**, definido por el dueño en `docs/design/DESIGN.md` con capturas
+en `docs/design/screens/`. Inter, base de 4px, márgenes de 20, esquinas de 16, sombras ambientales.
+Los tokens se traducen a código en `config/theme/` y **no se re-inventan en los widgets**: un padding
+de 13px es un widget que se salió de la grilla.
+
+### 12.1 Dos paletas que no se mezclan
+
+| Paleta | Qué viste | Dónde vive |
+|---|---|---|
+| **Marca** — verde, azul, ámbar | El chrome: cabecera, barra inferior, botones, la llama de la racha | `AppColors` |
+| **Metas** — los 8 slots | La identidad de cada meta: espina de la tarjeta, badge del icono, relleno del check | `HabitPalette` |
+
+Están separadas a propósito. Si fueran una sola, la app no podría distinguir "esto es un botón" de
+"esta es la meta de meditar". El dueño decidió el 2026-08-17 que **el color lo elige el usuario**
+(los 8 slots), no la categoría — el `DESIGN.md` proponía derivarlo de la categoría, pero eso dejaba
+siete categorías sin color y mataba `HabitColorSlot`.
+
+Los 8 slots se **revalidaron** contra las superficies nuevas y siguen pasando; ver la tabla en
+`HabitPalette`. El modo oscuro se derivó de los tokens `inverse-*` y `*-fixed-dim` que el propio
+documento trae, no se inventó.
+
+### 12.2 El icono sale de la categoría
+
+`CategoryIcons` mapea las 10 categorías a glifos. Sin campo nuevo en `Habit` y sin selector en el
+formulario. El precio es que es tosco: una meta llamada "Tomar agua" archivada en Salud recibe un
+corazón, no una gota. Si eso molesta, un `icon` nullable en `Habit` que sobreescriba el mapa es un
+cambio aditivo.
+
+### 12.3 El estado que el diseño no tenía
+
+Ninguna captura muestra un check deshabilitado, y esa es una regla central de la app (§3.5). Se
+resolvió así, y está pendiente de que el dueño lo apruebe o lo reemplace por un frame propio:
+
+- **Hoy no toca** → caja con borde tenue, no tocable, y el renglón de la racha dice "Hoy no toca".
+- **Cupo lleno** → igual, con "3/3 esta semana".
+- **Completada hoy** → caja rellena con el color de la meta, nombre tachado, y **sigue siendo
+  tocable** para deshacer. Bloquear el deshacer dejaría al usuario sin forma de corregir un toque
+  accidental.
+
+El renglón bajo el nombre describe el **horario**, y distingue los dos modos porque no son lo mismo:
+`TimesPerPeriod` da "3 veces por semana", `SpecificWeekdays` da "Lun, Mié, Sáb". Confundirlos haría
+que la tarjeta mienta sobre a qué se comprometió el usuario.
+
+### 12.4 Alcance
+
+- **El heatmap por tarjeta es fase 5**, por decisión del dueño. La tarjeta de la fase 3 llega hasta
+  el renglón de estado.
+- **La barra inferior de 4 pestañas se construyó en la fase 3** aunque solo la primera tenga
+  contenido. Cambia la geometría de todas las pantallas —padding inferior, safe areas, dónde cabe un
+  botón flotante— y meterla después obligaría a re-maquetar trabajo ya cerrado.
+- **Crear una meta se hace desde un botón flotante `+` en la Home.** Decidido por el dueño el
+  2026-08-17: el `DESIGN.md` no tenía ninguna entrada al formulario y las cuatro pestañas están
+  ocupadas. Llega con la fase 4, y **reemplaza al botón temporal de sembrado**.
+- **El saludo no lleva nombre.** El diseño dice "Good morning, Alex" pero la cuenta es anónima hasta
+  la fase 7. Un saludo con un hueco donde va el nombre es peor que uno sin nombre.

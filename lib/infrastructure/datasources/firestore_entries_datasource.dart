@@ -48,6 +48,20 @@ final class FirestoreEntriesDatasource implements EntriesDatasource {
   }
 
   @override
+  Stream<List<HabitEntry>> watchEntries({DateOnly? from, DateOnly? to}) {
+    Query<Map<String, dynamic>> query = _collection;
+    if (from != null) {
+      query = query.where('date', isGreaterThanOrEqualTo: from.toIso8601());
+    }
+    if (to != null) {
+      query = query.where('date', isLessThanOrEqualTo: to.toIso8601());
+    }
+    // Ordering by `date` alone needs no composite index — a single-field index
+    // Firestore maintains automatically.
+    return query.orderBy('date').snapshots().map(_toEntities);
+  }
+
+  @override
   Stream<List<HabitEntry>> watchEntriesForHabit(
     String habitId, {
     DateOnly? from,

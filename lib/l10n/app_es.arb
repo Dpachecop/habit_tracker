@@ -23,6 +23,28 @@
   "quotaProgressMonth": "{completed}/{target} este mes",
   "quotaProgressYear": "{completed}/{target} este año",
 
+  "homeGreetingMorning": "Buenos días.",
+  "homeGreetingAfternoon": "Buenas tardes.",
+  "homeGreetingEvening": "Buenas noches.",
+
+  "homeHabitsLeft": "{count, plural, =0{No te queda nada para hoy. Bien hecho.} =1{Te queda 1 meta por cumplir hoy.} other{Te quedan {count} metas por cumplir hoy.}}",
+  "homeNothingDueToday": "Hoy no toca ninguna meta.",
+  "homeEmptyHint": "Crea tu primera meta para empezar una racha.",
+
+  "streakDays": "{count, plural, =1{1 día de racha} other{{count} días de racha}}",
+  "streakNone": "Sin racha todavía",
+
+  "scheduleDaily": "Diaria",
+  "scheduleTimesPerWeek": "{times, plural, =1{Una vez por semana} =2{Dos veces por semana} other{{times} veces por semana}}",
+  "scheduleTimesPerMonth": "{times, plural, =1{Una vez al mes} =2{Dos veces al mes} other{{times} veces al mes}}",
+  "scheduleTimesPerYear": "{times, plural, =1{Una vez al año} =2{Dos veces al año} other{{times} veces al año}}",
+
+  "navHome": "Inicio",
+  "navAnalytics": "Analítica",
+  "navSettings": "Ajustes",
+  "navProfile": "Perfil",
+  "comingSoon": "Muy pronto.",
+
   "categoryHealth": "Salud",
   "categoryFitness": "Ejercicio",
   "categoryMind": "Mente",
