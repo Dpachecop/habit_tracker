@@ -10,6 +10,7 @@ import '../../../domain/failures/failure.dart';
 import '../../../domain/repositories/entries_repository.dart';
 import '../../../domain/repositories/habits_repository.dart';
 import '../../../domain/services/habit_completion_policy.dart';
+import '../../../domain/services/habit_day_status.dart';
 import '../../../domain/services/streak_calculator.dart';
 import 'habits_event.dart';
 import 'habits_state.dart';
@@ -51,6 +52,15 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
   /// out of this bloc is only the longest *within the window* — the reports
   /// phase needs its own, wider read and must not reuse this one.
   static const int historyWindowDays = 400;
+
+  /// How many days of statuses each card is handed for its heatmap.
+  ///
+  /// Comfortably more than a phone can show at four rows — the widest sensible
+  /// layout is around 60 columns — so the card can take the tail that fits
+  /// instead of the bloc guessing at screen width. Well inside
+  /// [historyWindowDays], so every status is backed by real data rather than by
+  /// the absence of it.
+  static const int heatmapWindowDays = 240;
 
   final HabitsRepository _habits;
   final EntriesRepository _entries;
@@ -210,6 +220,12 @@ class HabitsBloc extends Bloc<HabitsEvent, HabitsState> {
             today: today,
           ),
           isCompletedToday: completedToday,
+          recentDays: HabitDayStatuses.lastDays(
+            habit: habit,
+            entries: own,
+            today: today,
+            length: heatmapWindowDays,
+          ),
         ),
       );
     }

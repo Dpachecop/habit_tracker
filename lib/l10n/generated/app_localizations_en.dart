@@ -18,8 +18,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeEmpty => 'No habits yet.';
 
   @override
-  String get errorNetwork =>
-      'No connection. Your changes will sync once you are back online.';
+  String get errorNetwork => 'No connection. Your changes will sync once you are back online.';
 
   @override
   String get errorNotFound => 'We could not find that.';
@@ -37,24 +36,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorCompletionArchived => 'This habit is archived.';
 
   @override
-  String get errorCompletionOutsideRange =>
-      'That day falls outside the habit\'s date range.';
+  String get errorCompletionOutsideRange => 'That day falls outside the habit\'s date range.';
 
   @override
-  String get errorCompletionFutureDate =>
-      'You cannot check off a day that has not happened yet.';
+  String get errorCompletionFutureDate => 'You cannot check off a day that has not happened yet.';
 
   @override
-  String get errorCompletionAlreadyRecorded =>
-      'You already checked this day off.';
+  String get errorCompletionAlreadyRecorded => 'You already checked this day off.';
 
   @override
-  String get errorCompletionNotScheduled =>
-      'This habit is not scheduled for that day.';
+  String get errorCompletionNotScheduled => 'This habit is not scheduled for that day.';
 
   @override
-  String get errorCompletionQuotaReached =>
-      'You have already met this period\'s goal.';
+  String get errorCompletionQuotaReached => 'You have already met this period\'s goal.';
 
   @override
   String get checkDisabledNotToday => 'Not today';
@@ -265,12 +259,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get formEndBeforeStart => 'The end cannot come before the start.';
 
   @override
-  String get formScheduleChangeTomorrow =>
-      'The new days apply from tomorrow. Every day up to today keeps the old schedule, so the streak you have earned is safe.';
+  String get formScheduleChangeTomorrow => 'The new days apply from tomorrow. Every day up to today keeps the old schedule, so the streak you have earned is safe.';
 
   @override
-  String get formScheduleChangeToday =>
-      'The new target applies from today. The days you have already completed still count towards it.';
+  String get formScheduleChangeToday => 'The new target applies from today. The days you have already completed still count towards it.';
 
   @override
   String get formUnreachableTitle => 'This period is already out of reach';
@@ -300,8 +292,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get formArchive => 'Archive goal';
 
   @override
-  String get formArchiveExplain =>
-      'It leaves your list but keeps its history. Nothing is deleted.';
+  String get formArchiveExplain => 'It leaves your list but keeps its history. Nothing is deleted.';
 
   @override
   String get formArchiveConfirmTitle => 'Archive this goal?';
@@ -311,6 +302,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get formArchived => 'Goal archived.';
+
+  @override
+  String heatmapSummary(int days, int completed) {
+    return 'Last $days days, $completed completed.';
+  }
 
   @override
   String get categoryHealth => 'Health';

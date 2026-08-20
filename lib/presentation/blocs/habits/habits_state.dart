@@ -5,6 +5,7 @@ import '../../../domain/entities/habit.dart';
 import '../../../domain/entities/streak.dart';
 import '../../../domain/failures/failure.dart';
 import '../../../domain/services/habit_completion_policy.dart';
+import '../../../domain/services/habit_day_status.dart';
 
 /// How far the state has got.
 enum HabitsStatus {
@@ -36,6 +37,7 @@ final class HabitSummary extends Equatable {
     required this.streak,
     required this.availability,
     required this.isCompletedToday,
+    required this.recentDays,
   });
 
   /// The habit itself.
@@ -51,6 +53,17 @@ final class HabitSummary extends Equatable {
   /// Whether today already has an entry.
   final bool isCompletedToday;
 
+  /// One status per day for the heatmap, oldest first, ending today.
+  ///
+  /// Computed here rather than in the widget for the same reason as everything
+  /// else on this class: deciding what counts as a missed day is a domain
+  /// question, and the grid must not answer it differently from the streak
+  /// drawn three centimetres above it.
+  ///
+  /// Longer than any card can show. The card takes the tail that fits its
+  /// width, which the bloc has no way to know.
+  final List<DayStatus> recentDays;
+
   /// Whether tapping the check would do something right now.
   ///
   /// This is also the definition of "left to complete today": the domain already
@@ -63,6 +76,7 @@ final class HabitSummary extends Equatable {
     streak,
     availability,
     isCompletedToday,
+    recentDays,
   ];
 }
 

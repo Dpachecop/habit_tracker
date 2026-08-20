@@ -9,6 +9,7 @@ import 'package:habit_tracker/domain/entities/habit_schedule.dart';
 import 'package:habit_tracker/domain/entities/streak.dart';
 import 'package:habit_tracker/domain/entities/weekday.dart';
 import 'package:habit_tracker/domain/services/habit_completion_policy.dart';
+import 'package:habit_tracker/domain/services/habit_day_status.dart';
 import 'package:habit_tracker/presentation/blocs/habits/habits_state.dart';
 import 'package:habit_tracker/presentation/widgets/habit_card.dart';
 import 'package:habit_tracker/presentation/widgets/habit_check_box.dart';
@@ -36,6 +37,14 @@ void main() {
       today: today,
     ),
     isCompletedToday: entries.any((HabitEntry entry) => entry.date == today),
+    // Through the real projection, so the card is fed exactly what the bloc
+    // would feed it.
+    recentDays: HabitDayStatuses.lastDays(
+      habit: habit,
+      entries: entries,
+      today: today,
+      length: 120,
+    ),
   );
 
   group('a habit due today', () {
@@ -192,6 +201,7 @@ void main() {
               CompletionBlockReason.alreadyCompleted,
             ),
             isCompletedToday: true,
+            recentDays: const <DayStatus>[DayStatus.completed],
           ),
           onToggle: () => taps++,
         ),
