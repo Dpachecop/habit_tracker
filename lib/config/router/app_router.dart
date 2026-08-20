@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../presentation/l10n/l10n_extensions.dart';
 import '../../domain/entities/habit_color_slot.dart';
+import '../../presentation/screens/habit_detail/habit_detail_screen.dart';
 import '../../presentation/screens/habit_form/habit_form_loader.dart';
 import '../../presentation/screens/habit_form/habit_form_screen.dart';
 import '../../presentation/screens/home/home_screen.dart';
@@ -41,11 +42,25 @@ abstract final class AppRouter {
               // which ones are taken and this route does not.
               HabitFormScreen(suggestedColor: state.extra as HabitColorSlot?),
         ),
+        // Detail first, edit under it: `/habit/:id` shows the habit and
+        // `/habit/:id/edit` changes it. Until phase 5 the bare id route opened
+        // the form, so there was no way to look at a habit without being put in
+        // a position to change it.
         GoRoute(
-          path: HabitFormScreen.editPath,
+          path: HabitDetailScreen.routePath,
           builder:
               (BuildContext context, GoRouterState state) =>
-                  HabitFormLoader(habitId: state.pathParameters['habitId']!),
+                  HabitDetailScreen(habitId: state.pathParameters['habitId']!),
+          routes: <RouteBase>[
+            GoRoute(
+              path: 'edit',
+              builder:
+                  (BuildContext context, GoRouterState state) =>
+                      HabitFormLoader(
+                        habitId: state.pathParameters['habitId']!,
+                      ),
+            ),
+          ],
         ),
         // A *stateful* shell, not a plain one: each tab keeps its own navigation
         // stack and scroll offset, so switching away from a scrolled habit list

@@ -12,6 +12,7 @@ import '../../blocs/habits/habits_state.dart';
 import '../../l10n/failure_messages.dart';
 import '../../l10n/l10n_extensions.dart';
 import '../../widgets/habit_card.dart';
+import '../habit_detail/habit_detail_screen.dart';
 import '../habit_form/habit_form_screen.dart';
 
 /// The main panel: the day's greeting and the habit list.
@@ -149,7 +150,12 @@ class _Loaded extends StatelessWidget {
               child: HabitCard(
                 summary: summary,
                 onToggle: () => bloc.add(HabitCheckToggled(summary.habit)),
-                onEdit: () => context.push('/habit/${summary.habit.id}'),
+                // Opens the detail, not the form: tapping a habit should let you
+                // look at it first.
+                onEdit:
+                    () => context.push(
+                      HabitDetailScreen.pathFor(summary.habit.id),
+                    ),
               ),
             ),
       ],

@@ -309,6 +309,38 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get detailTitle => 'Meta';
+
+  @override
+  String get detailEdit => 'Editar';
+
+  @override
+  String get detailClose => 'Cerrar';
+
+  @override
+  String get detailPreviousMonth => 'Mes anterior';
+
+  @override
+  String get detailNextMonth => 'Mes siguiente';
+
+  @override
+  String detailStreakChip(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count días',
+      one: '1 día',
+      zero: 'Sin racha',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String detailLongestStreak(int count) {
+    return 'Mejor: $count';
+  }
+
+  @override
   String get categoryHealth => 'Salud';
 
   @override
