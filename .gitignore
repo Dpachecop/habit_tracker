@@ -50,3 +50,6 @@ app.*.map.json
 /lib/firebase_options.dart
 /android/app/google-services.json
 /ios/Runner/GoogleService-Info.plist
+
+# Claude Code: the rules in .claude/rules/ are shared, local permissions are not
+.claude/settings.local.json

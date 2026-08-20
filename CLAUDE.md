@@ -61,15 +61,28 @@ Key invariants:
 
 ## Conventions
 
+**Commits, branches and PRs are governed by @.claude/rules/commits.md — always in force, no
+exceptions.** That file is the source of truth; the notes below only add what it does not cover.
+
 - **Every class and every function gets a dartdoc `///` comment, in English.** Explain the *why*;
   do not restate the signature. This is a hard requirement from the project owner.
-- Conventional commits, restricted to four types: `feat`, `fix`, `docs`, `refactor`.
 - **Keep commit messages short** — a subject line is usually the whole message. Add a body only
   for a *why* the code cannot express, and then one or two lines, never paragraphs. The project
   owner asked for this explicitly after an over-long first commit.
-- One branch per feature (`feat/habit-form`, `fix/streak-week-boundary`), integrated via PR.
-  Never commit straight to the default branch. `gh` is not installed — push the branch and hand
-  over the PR URL instead of trying to open it.
+- **`gh` is installed and authenticated. Open the PR yourself** when a phase closes — push the
+  branch and run `gh pr create`, rather than handing over a link and calling it done. Verify a
+  claim like this before acting on it: this line used to say the opposite, and six phases shipped
+  with no PRs because of it.
+- **Branches stack.** Until a phase is merged, the next one branches off it, so its PR must target
+  its parent (`gh pr create --base <parent>`) and not `main`. Based on `main`, every diff would
+  carry all the earlier phases and be unreviewable.
+- **Run `flutter pub get` after every branch switch.** Each phase has its own `pubspec.lock` —
+  `feat/domain` predates Firebase, `feat/l10n` predates Inter — so a checkout swaps the lockfile and
+  leaves `.dart_tool` resolved against packages that are no longer there. The symptom is a wall of
+  "Target of URI doesn't exist" in `test/`, with `lib/` untouched: that is never the code. Recover
+  with `git checkout -- pubspec.lock && flutter pub get`.
+- Branch names follow `<type>/<kebab-name>`: `feat/habit-form`, `fix/streak-week-boundary`,
+  `docs/commit-rules`.
 - `flutter analyze` must be clean before any commit.
 - Domain logic is covered by pure unit tests — no widget test harness needed for `domain/`.
 - **Never hard-code user-facing text.** Every string the user reads lives in `lib/l10n/app_en.arb`
@@ -79,7 +92,7 @@ Key invariants:
 ## Commands
 
 ```bash
-flutter pub get                  # after any pubspec.yaml change
+flutter pub get                  # after any pubspec.yaml change AND after every branch switch
 flutter run                      # attached device; flutter devices to list targets
 flutter analyze                  # lint + type check (flutter_lints)
 dart format lib test
