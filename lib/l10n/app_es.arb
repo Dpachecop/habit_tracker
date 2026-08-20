@@ -97,6 +97,8 @@
   "formArchiveConfirm": "Archivar",
   "formArchived": "Meta archivada.",
 
+  "heatmapSummary": "Últimos {days} días, {completed} cumplidos.",
+
   "categoryHealth": "Salud",
   "categoryFitness": "Ejercicio",
   "categoryMind": "Mente",

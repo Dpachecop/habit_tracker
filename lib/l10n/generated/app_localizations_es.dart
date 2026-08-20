@@ -18,8 +18,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get homeEmpty => 'Todavía no tienes metas.';
 
   @override
-  String get errorNetwork =>
-      'Sin conexión. Tus cambios se sincronizarán cuando vuelvas a tener red.';
+  String get errorNetwork => 'Sin conexión. Tus cambios se sincronizarán cuando vuelvas a tener red.';
 
   @override
   String get errorNotFound => 'No encontramos eso.';
@@ -28,8 +27,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorPermission => 'No tienes acceso a eso.';
 
   @override
-  String get errorCache =>
-      'No se pudieron leer los datos guardados en este dispositivo.';
+  String get errorCache => 'No se pudieron leer los datos guardados en este dispositivo.';
 
   @override
   String get errorUnknown => 'Algo salió mal.';
@@ -38,12 +36,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorCompletionArchived => 'Esta meta está archivada.';
 
   @override
-  String get errorCompletionOutsideRange =>
-      'Ese día queda fuera del rango de fechas de la meta.';
+  String get errorCompletionOutsideRange => 'Ese día queda fuera del rango de fechas de la meta.';
 
   @override
-  String get errorCompletionFutureDate =>
-      'No puedes marcar un día que todavía no ha pasado.';
+  String get errorCompletionFutureDate => 'No puedes marcar un día que todavía no ha pasado.';
 
   @override
   String get errorCompletionAlreadyRecorded => 'Ya marcaste este día.';
@@ -52,8 +48,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorCompletionNotScheduled => 'Esta meta no toca ese día.';
 
   @override
-  String get errorCompletionQuotaReached =>
-      'Ya cumpliste el objetivo de este período.';
+  String get errorCompletionQuotaReached => 'Ya cumpliste el objetivo de este período.';
 
   @override
   String get checkDisabledNotToday => 'Hoy no toca';
@@ -246,8 +241,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formTimeTo => 'Hasta';
 
   @override
-  String get formTimeWindowInvalid =>
-      'El fin tiene que ser después del inicio.';
+  String get formTimeWindowInvalid => 'El fin tiene que ser después del inicio.';
 
   @override
   String get formDatesLabel => 'Fechas';
@@ -265,12 +259,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formEndBeforeStart => 'El fin no puede ser antes del inicio.';
 
   @override
-  String get formScheduleChangeTomorrow =>
-      'Los días nuevos aplican desde mañana. Todo hasta hoy conserva el horario anterior, así que la racha que ya ganaste está a salvo.';
+  String get formScheduleChangeTomorrow => 'Los días nuevos aplican desde mañana. Todo hasta hoy conserva el horario anterior, así que la racha que ya ganaste está a salvo.';
 
   @override
-  String get formScheduleChangeToday =>
-      'El objetivo nuevo aplica desde hoy. Los días que ya cumpliste siguen contando para él.';
+  String get formScheduleChangeToday => 'El objetivo nuevo aplica desde hoy. Los días que ya cumpliste siguen contando para él.';
 
   @override
   String get formUnreachableTitle => 'Este período ya no se alcanza';
@@ -300,8 +292,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formArchive => 'Archivar meta';
 
   @override
-  String get formArchiveExplain =>
-      'Sale de tu lista pero conserva su historial. No se borra nada.';
+  String get formArchiveExplain => 'Sale de tu lista pero conserva su historial. No se borra nada.';
 
   @override
   String get formArchiveConfirmTitle => '¿Archivar esta meta?';
@@ -311,6 +302,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get formArchived => 'Meta archivada.';
+
+  @override
+  String heatmapSummary(int days, int completed) {
+    return 'Últimos $days días, $completed cumplidos.';
+  }
 
   @override
   String get categoryHealth => 'Salud';

@@ -10,6 +10,7 @@ import '../l10n/domain_labels.dart';
 import '../l10n/l10n_extensions.dart';
 import '../l10n/schedule_labels.dart';
 import 'habit_check_box.dart';
+import 'habit_heatmap.dart';
 
 /// One habit on the home screen.
 ///
@@ -61,50 +62,81 @@ class HabitCard extends StatelessWidget {
       // poking square edges past them.
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        // IntrinsicHeight is what makes the spine work at all. `stretch` needs a
-        // bounded height to stretch *to*, and inside a ListView the incoming
-        // height constraint is infinite — without this the whole card fails to
-        // lay out and silently never appears. Cheap here: the card is a shallow
-        // row, not a nested tree.
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              // The habit's color, carried on the edge rather than as a fill: it
-              // has to identify the habit without ever competing with the text.
-              SizedBox(width: _accentWidth, child: ColoredBox(color: accent)),
-              Expanded(
+        // A Stack, not a stretched Row. The spine has to run the full height of
+        // a card whose height comes from its content, and the obvious way to do
+        // that — IntrinsicHeight around a Row with CrossAxisAlignment.stretch —
+        // cannot contain the LayoutBuilder the heatmap needs, because a
+        // LayoutBuilder has no intrinsic dimensions to report. A Stack sizes to
+        // its non-positioned child and lets the spine stretch to match, with no
+        // intrinsic pass at all.
+        child: Stack(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: _accentWidth),
+              child: InkWell(
                 // The card body opens the form. The check sits on top with its
                 // own gesture, so tapping it never opens the editor by mistake.
-                child: InkWell(
-                  onTap: onEdit,
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Row(
-                      children: <Widget>[
-                        _IconBadge(summary: summary, accent: accent),
-                        const SizedBox(width: AppSpacing.gutter),
-                        Expanded(child: _Details(summary: summary)),
-                        const SizedBox(width: AppSpacing.gutter),
-                        HabitCheckBox(
-                          accent: accent,
-                          isChecked: summary.isCompletedToday,
-                          // Tappable when it can be checked *or* unchecked. The
-                          // policy blocks re-checking a finished day, but undoing
-                          // one is always allowed — a mistap has to be correctable,
-                          // and it can only ever shorten a streak, never forge one.
-                          isEnabled:
-                              summary.isActionable || summary.isCompletedToday,
-                          onTap: onToggle,
-                          semanticLabel: _checkSemantics(context),
-                        ),
-                      ],
+                onTap: onEdit,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      child: Row(
+                        children: <Widget>[
+                          _IconBadge(summary: summary, accent: accent),
+                          const SizedBox(width: AppSpacing.gutter),
+                          Expanded(child: _Details(summary: summary)),
+                          const SizedBox(width: AppSpacing.gutter),
+                          HabitCheckBox(
+                            accent: accent,
+                            isChecked: summary.isCompletedToday,
+                            // Tappable when it can be checked *or* unchecked.
+                            // The policy blocks re-checking a finished day, but
+                            // undoing one is always allowed — a mistap has to be
+                            // correctable, and it can only ever shorten a
+                            // streak, never forge one.
+                            isEnabled:
+                                summary.isActionable ||
+                                summary.isCompletedToday,
+                            onTap: onToggle,
+                            semanticLabel: _checkSemantics(context),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                    // A hairline, inset so it does not run into the spine.
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                      ),
+                      child: Divider(
+                        height: 1,
+                        thickness: 1,
+                        color: scheme.outlineVariant,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      child: HabitHeatmap(
+                        statuses: summary.recentDays,
+                        accent: accent,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+            // The habit's color, carried on the edge rather than as a fill: it
+            // has to identify the habit without ever competing with the text.
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: _accentWidth,
+              child: ColoredBox(color: accent),
+            ),
+          ],
         ),
       ),
     );

@@ -274,6 +274,12 @@
   "formArchived": "Goal archived.",
   "@formArchived": { "description": "Confirmation after archiving." },
 
+  "heatmapSummary": "Last {days} days, {completed} completed.",
+  "@heatmapSummary": {
+    "description": "Screen-reader label for the whole day grid on a habit card. One label for the strip rather than one per cell, which would be noise.",
+    "placeholders": { "days": { "type": "int" }, "completed": { "type": "int" } }
+  },
+
   "categoryHealth": "Health",
   "@categoryHealth": { "description": "HabitCategory.health" },
   "categoryFitness": "Fitness",
