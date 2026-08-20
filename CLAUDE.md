@@ -17,7 +17,13 @@ what is decided, what is next. Update it as part of the PR that closes each phas
 file is worse than none.
 
 Flutter stable 3.29.3, Dart `^3.7.2`. Platforms: **android + ios** (`web/` exists but is out of
-scope). Bundle id is still the default `com.example.habit_tracker`.
+scope). Bundle ids are still the defaults, and they differ per platform: `com.example.habit_tracker`
+on android, `com.example.habitTracker` on ios — Apple does not allow underscores. `minSdk` is 23,
+raised from Flutter's 21 because `firebase_auth` requires it.
+
+Firebase is connected (project `habit-tracker-f30b61`), but its three generated config files are
+**gitignored** — see `docs/STATUS.md` for the one command that regenerates them on a new machine.
+`flutter analyze` and `flutter test` do not need them; only a device build does.
 
 ## Architecture
 

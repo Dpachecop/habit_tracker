@@ -1,0 +1,24 @@
+{
+  "//": "Composite indexes. Deploy with: firebase deploy --only firestore:indexes",
+  "//habitId+date": "Needed by entriesForHabit / watchEntriesForHabit: an equality filter on habitId plus a range on date cannot be served by the single-field indexes. Firestore refuses the query outright without it, so this is not an optimization.",
+  "indexes": [
+    {
+      "collectionGroup": "entries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "habitId", "order": "ASCENDING" },
+        { "fieldPath": "date", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "watchHabits filters archived habits out and orders by creation.",
+      "collectionGroup": "habits",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isArchived", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

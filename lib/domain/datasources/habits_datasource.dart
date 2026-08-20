@@ -27,4 +27,7 @@ abstract interface class HabitsDatasource {
   /// There is no delete in this contract on purpose — entries reference the
   /// habit and removing it would tear a hole in the history.
   Future<void> archiveHabit(String id);
+
+  /// Clears the archived flag, putting the habit back in the active list.
+  Future<void> restoreHabit(String id);
 }

@@ -4,8 +4,9 @@
 > El roadmap completo vive en `ARCHITECTURE.md` §10 — aquí no se duplica para que no se
 > desincronice.
 
-**Última actualización:** 2026-08-06
-**Fase actual:** 1 — Dominio **completada**. Siguiente: fase 2 (infraestructura).
+**Última actualización:** 2026-08-07
+**Fase actual:** 2 — Infraestructura **completada**, Firebase conectado y desplegado.
+Siguiente: fase 3 (Home).
 **Arquitectura:** aprobada por el dueño el 2026-08-06, con las correcciones ya incorporadas.
 
 ---
@@ -72,9 +73,45 @@ Pedido por el dueño el 2026-08-06, fuera del roadmap original. Diseño en `ARCH
 
 El idioma sigue al del dispositivo; el selector manual llega con la pantalla de ajustes.
 
+### De la fase 2 — infraestructura
+
+`lib/infrastructure/models/` — `HabitDto` y `HabitEntryDto`: la forma del documento, separada de la
+entidad. Las fechas se guardan como `yyyy-MM-dd`, no como timestamps: son días de calendario, y un
+timestamp reintroduciría por la base de datos la zona horaria que `DateOnly` existe para quitar.
+De paso ordenan lexicográficamente igual que cronológicamente, que es lo que hace posibles las
+consultas por rango.
+
+`lib/infrastructure/mappers/` — DTO ↔ entidad. Lo interesante es el horario: un documento no puede
+guardar una unión sellada, así que cada versión lleva un discriminador `type` y se lee con un
+switch que **falla ruidosamente** ante un tipo desconocido. Una categoría desconocida, en cambio,
+degrada a `other`: es una etiqueta, no puede corromper una racha, y perder la meta entera por ella
+sería mucho peor.
+
+`lib/infrastructure/datasources/` — `FirestoreHabitsDatasource` y `FirestoreEntriesDatasource`.
+Reciben el uid como **callback**, no como valor: la sesión cambia (anónima hoy, cuenta real en la
+fase 7) y un uid capturado seguiría escribiendo en el árbol del usuario anterior. Las rutas se
+construyen en `firestore_paths.dart`, un único sitio que tiene que coincidir con las reglas.
+
+`lib/infrastructure/errors/` — `failure_mapper.dart` (el único archivo de la app al que se le
+permite nombrar `FirebaseException`) y `guard.dart`, que envuelve las llamadas en `Either`. El
+guard de streams usa un transformer y no `handleError` a propósito: `handleError` deja que el error
+termine la suscripción, y la pantalla principal escucha `watchHabits` durante toda la vida de la
+app — un fallo transitorio no puede dejarla muda para siempre.
+
+`lib/infrastructure/repositories/` — los tres. `EntriesRepositoryImpl` es **el punto donde se
+aplica §3.5**: antes de escribir consulta el período y le pregunta a `HabitCompletionPolicy`. Que
+el botón esté deshabilitado es una cortesía; esto es la regla.
+
+`lib/config/di/` — `AppDependencies` (raíz de composición, el único sitio que nombra a la vez un
+datasource concreto y el contrato que cumple) y `AppBootstrap` (Firebase, caché offline, login
+anónimo, y luego el grafo). `main.dart` ya inyecta los repositorios con `MultiRepositoryProvider`.
+
+`firestore.rules` y `firestore.indexes.json` en la raíz, versionados. El índice `(habitId, date)`
+no es opcional: sin él Firestore rechaza la consulta de los reportes.
+
 ### Pruebas
 
-112 en verde, `flutter analyze` limpio. `test/domain/`:
+172 en verde, `flutter analyze` limpio. `test/domain/`:
 
 - `fixtures.dart` — constructores de metas y entradas; las fechas ancla son reales de 2026.
 - Entidades: `date_only`, `date_period`, `habit_schedule`, `habit`.
@@ -85,7 +122,12 @@ El idioma sigue al del dispositivo; el selector manual llega con la pantalla de 
 - `domain_purity_test.dart` — falla el build si alguien importa Flutter, Firebase, `dart:ui` o
   `dart:io` dentro de `lib/domain/`. La regla de dependencia deja de depender de la disciplina.
 
-**Todavía no hay:** Firebase, implementaciones de los contratos, blocs ni UI real.
+Y de la fase 2: mappers (ida y vuelta completa, historial multi-versión, documentos corruptos),
+`failure_mapper`, rutas de Firestore, el guard de sesión cerrada, los tres repositorios sobre
+datasources en memoria — incluyendo que una escritura rechazada por §3.5 **no escribe nada** — y
+`FirebaseAuthRepository` sobre `firebase_auth_mocks`.
+
+**Todavía no hay:** blocs ni UI real. La pantalla principal sigue siendo el placeholder.
 
 ---
 
@@ -113,15 +155,23 @@ No volver a abrirlas sin que el dueño lo pida.
 | **Modelado del dominio** | **Clases Dart 3 a mano (`sealed`/`final`) + `equatable`, sin `freezed`.** Es lo que dibuja el propio §3.2, y deja `domain/` sin `build_runner` ni archivos generados. `freezed` se reserva para DTOs y estados de bloc |
 | **Un período solo juzga si está completo** | Un bucket de modo B solo puede **cortar** la racha si está cerrado, entero dentro del rango y gobernado por un único modo. Si no, cuenta sus días pero no corta. Cubre la primera semana a medias y el cambio de modo a mitad de semana, y respeta que los buckets no se parten (§3.4) |
 | **Ventana horaria** | Sin soporte para franjas que cruzan medianoche. No hace falta y volvería ambigua la pregunta "¿de qué día es esto?" |
+| **Fechas en Firestore** | `yyyy-MM-dd` como string, no `Timestamp`. Son días de calendario; un timestamp devolvería la zona horaria que `DateOnly` quita. Además ordena y consulta por rango igual que una fecha |
+| **Errores en streams** | Llegan como `Left` **sin terminar la suscripción**. `handleError` la mataría, y la Home escucha durante toda la vida de la app |
+| **uid por callback** | Los datasources reciben `String? Function()`, no el uid. La sesión cambia en la fase 7 y un uid capturado escribiría en el árbol anterior |
+| **`minSdk` = 23** | Subido desde el 21 de Flutter porque `firebase_auth` lo exige. API 23 es Android 6.0 (2015); el alcance perdido es despreciable |
+| **Bundle id distinto por plataforma** | android `com.example.habit_tracker`, ios `com.example.habitTracker`. Apple no admite guion bajo — el primer intento de registrar la app iOS falló por eso. Al cambiarlo para distribuir, son **dos** strings |
+| **Config de Firebase fuera del repo** | Los tres archivos generados van a `.gitignore` porque el repo es público. Por eso `AppBootstrap` inicializa **sin** `options`: importar `firebase_options.dart` rompería `analyze` y `test` en un clon nuevo |
+| **Sin tests de Firestore real** | `fake_cloud_firestore` 4.1.1 no compila contra `cloud_firestore` 6.8, y la 4.2 exige Dart 3.8 (el proyecto está en 3.7.2). Ver *Pendientes* |
 
 ---
 
 ## Qué sigue
 
-**Fase 2 — Infraestructura.** Proyecto de Firebase (`flutterfire configure`), auth anónima,
-datasources de Firestore, DTOs y mappers, `failure_mapper.dart`, y las implementaciones de los
-tres repositorios. Los contratos ya están escritos y probados contra el dominio, así que esta fase
-es rellenarlos.
+**Fase 3 — Home.** `HabitsBloc` alimentado por `watchHabits()`, `HabitCard` con la racha y el
+check en el color de la meta, y el toggle optimista. Los repositorios ya están inyectados en el
+árbol, así que el bloc solo tiene que pedirlos con `context.read`.
+
+Antes de que la app arranque hace falta el paso manual de abajo.
 
 ---
 
@@ -135,11 +185,57 @@ es rellenarlos.
 - **Aviso del formulario al subir un objetivo** (`ARCHITECTURE.md` §3.4, la nota de "efecto a
   vigilar"): pasar de 3 a 5 un sábado deja la semana inalcanzable y garantiza el corte. El dominio
   ya se comporta así — hay test —, falta que la fase 4 lo avise en pantalla.
+- **Los datasources de Firestore no tienen tests propios.** `fake_cloud_firestore` 4.1.1 ya no
+  compila contra `cloud_firestore` 6.8 (cambió la firma de `WriteBatch.update`) y la 4.2 pide Dart
+  3.8, que Flutter 3.29.3 no trae. Lo que sí está cubierto: el mapeo entero (ida y vuelta), las
+  rutas, el guard de sesión cerrada y todo el comportamiento de los repositorios sobre datasources
+  en memoria. Lo que no: que las *queries* de Firestore devuelvan lo que se espera. Se recupera
+  subiendo a Flutter ≥ 3.32 (Dart 3.8) y `fake_cloud_firestore` 4.2, o con un test de integración
+  contra el emulador de Firestore. Subir Flutter es decisión del dueño, no la tomo yo.
 - **Selector manual de idioma.** Hoy se sigue el del dispositivo. Va con la pantalla de ajustes,
   que es donde habrá dónde persistir la elección; un `LocaleCubit` sin UI sería código muerto.
 - Proyecto de Firebase sin crear. Es lo primero de la fase 2.
-- El bundle id sigue siendo el default `com.example.habit_tracker`. Cambiarlo antes de cualquier
-  build de distribución.
-- Quedan `.gitkeep` en `config/constants`, `config/di`, todo `infrastructure/` y
-  `presentation/blocs` + `presentation/widgets/shared`; bórralos cuando la carpeta reciba su primer
-  archivo real.
+- **El bundle id sigue siendo el default.** Cambiarlo antes de cualquier build de distribución, y
+  recordar que son dos: `com.example.habit_tracker` en android y `com.example.habitTracker` en ios.
+  Cambiarlo obliga a volver a registrar las apps en Firebase y a regenerar la configuración.
+- **App Check sin montar.** Es lo que evita que un tercero use tus credenciales de cliente para
+  crear cuentas anónimas y gastar cuota. Las reglas ya impiden que lea datos ajenos; esto es cuota,
+  no confidencialidad. Vale la pena antes de publicar.
+- Quedan `.gitkeep` en `config/constants`, `presentation/blocs` y `presentation/widgets/shared`;
+  bórralos cuando la carpeta reciba su primer archivo real.
+
+---
+
+## Firebase — estado real
+
+Proyecto **`habit-tracker-f30b61`** (display name *Habit Tracker*), creado el 2026-08-07.
+Consola: <https://console.firebase.google.com/project/habit-tracker-f30b61>
+
+Hecho y verificado:
+
+- Apps registradas: android `com.example.habit_tracker`, ios `com.example.habitTracker`.
+- Base de datos Firestore `(default)` creada en `nam5`.
+- Reglas e índices desplegados desde `firestore.rules` y `firestore.indexes.json`.
+- Proveedor **Anonymous** habilitado en Authentication.
+
+### Los archivos de configuración NO están en el repo
+
+`lib/firebase_options.dart`, `android/app/google-services.json` y
+`ios/Runner/GoogleService-Info.plist` están en `.gitignore`. El repo es público y, aunque esas
+claves **no son secretos** — lo que protege los datos son las reglas, no la API key —, identifican
+el proyecto y permitirían a un tercero crear cuentas anónimas y gastar cuota. Quien quiera cerrar
+eso del todo, lo que hace falta es **App Check**, no esconder la key.
+
+En una máquina nueva, después de clonar:
+
+```bash
+firebase login
+flutterfire configure --project=habit-tracker-f30b61 \
+  --platforms=android,ios \
+  --android-package-name=com.example.habit_tracker \
+  --ios-bundle-id=com.example.habitTracker --yes
+```
+
+`flutter analyze` y `flutter test` funcionan **sin** ese paso: `AppBootstrap` llama a
+`Firebase.initializeApp()` sin `options` justo para no depender desde Dart de un archivo que no
+está versionado. Solo un build sobre dispositivo necesita los archivos nativos.
