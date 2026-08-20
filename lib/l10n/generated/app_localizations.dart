@@ -308,6 +308,270 @@ abstract class AppLocalizations {
   /// **'Coming soon.'**
   String get comingSoon;
 
+  /// App bar title when creating a habit.
+  ///
+  /// In en, this message translates to:
+  /// **'New goal'**
+  String get formTitleCreate;
+
+  /// App bar title when editing one.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit goal'**
+  String get formTitleEdit;
+
+  /// Primary action of the habit form.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get formSave;
+
+  /// Confirmation after creating a habit.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal created.'**
+  String get formSavedCreate;
+
+  /// Confirmation after editing a habit.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes saved.'**
+  String get formSavedEdit;
+
+  /// Label of the habit name field.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get formNameLabel;
+
+  /// Placeholder example in the name field.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning meditation'**
+  String get formNameHint;
+
+  /// Validation message for an empty name.
+  ///
+  /// In en, this message translates to:
+  /// **'Give your goal a name.'**
+  String get formNameRequired;
+
+  /// Section label for the category picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get formCategoryLabel;
+
+  /// Section label for the color picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get formColorLabel;
+
+  /// Section label for the schedule.
+  ///
+  /// In en, this message translates to:
+  /// **'How often'**
+  String get formScheduleLabel;
+
+  /// Schedule mode where the user names the weekdays. Distinct from the other mode because here the app decides which days count.
+  ///
+  /// In en, this message translates to:
+  /// **'On set days'**
+  String get formScheduleModeWeekdays;
+
+  /// Schedule mode where the user only sets a count per period and picks the days freely.
+  ///
+  /// In en, this message translates to:
+  /// **'A number of times'**
+  String get formScheduleModeTimes;
+
+  /// Validation message when no weekday is selected.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick at least one day.'**
+  String get formWeekdaysRequired;
+
+  /// Shortcut that selects all seven weekdays.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day'**
+  String get formEveryDay;
+
+  /// Label for the completions-per-period number.
+  ///
+  /// In en, this message translates to:
+  /// **'Times'**
+  String get formTimesLabel;
+
+  /// Label before the period selector.
+  ///
+  /// In en, this message translates to:
+  /// **'Per'**
+  String get formPeriodLabel;
+
+  /// SchedulePeriod.week.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get formPeriodWeek;
+
+  /// SchedulePeriod.month.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get formPeriodMonth;
+
+  /// SchedulePeriod.year.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get formPeriodYear;
+
+  /// Validation when the target exceeds the days available in the period. February is why the monthly cap is 28.
+  ///
+  /// In en, this message translates to:
+  /// **'At most {max} — a day can only be completed once.'**
+  String formTimesTooMany(int max);
+
+  /// Section label for the optional daily time window.
+  ///
+  /// In en, this message translates to:
+  /// **'Time of day'**
+  String get formTimeWindowLabel;
+
+  /// Toggle meaning no particular time of day.
+  ///
+  /// In en, this message translates to:
+  /// **'All day'**
+  String get formAllDay;
+
+  /// Start of the time window.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get formTimeFrom;
+
+  /// End of the time window.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get formTimeTo;
+
+  /// Validation for an inverted time window.
+  ///
+  /// In en, this message translates to:
+  /// **'The end has to come after the start.'**
+  String get formTimeWindowInvalid;
+
+  /// Section label for the date range.
+  ///
+  /// In en, this message translates to:
+  /// **'Dates'**
+  String get formDatesLabel;
+
+  /// Label for the range start.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts'**
+  String get formStartDate;
+
+  /// Label for the range end.
+  ///
+  /// In en, this message translates to:
+  /// **'Ends'**
+  String get formEndDate;
+
+  /// Toggle for an open-ended habit.
+  ///
+  /// In en, this message translates to:
+  /// **'No end date'**
+  String get formNoEndDate;
+
+  /// Validation for an inverted date range.
+  ///
+  /// In en, this message translates to:
+  /// **'The end cannot come before the start.'**
+  String get formEndBeforeStart;
+
+  /// Notice shown when editing to a SpecificWeekdays schedule. ARCHITECTURE.md 3.4.
+  ///
+  /// In en, this message translates to:
+  /// **'The new days apply from tomorrow. Every day up to today keeps the old schedule, so the streak you have earned is safe.'**
+  String get formScheduleChangeTomorrow;
+
+  /// Notice shown when editing to a TimesPerPeriod schedule. ARCHITECTURE.md 3.4.
+  ///
+  /// In en, this message translates to:
+  /// **'The new target applies from today. The days you have already completed still count towards it.'**
+  String get formScheduleChangeToday;
+
+  /// Dialog title for the 3.4 warning.
+  ///
+  /// In en, this message translates to:
+  /// **'This period is already out of reach'**
+  String get formUnreachableTitle;
+
+  /// The 3.4 warning for a weekly target. Burning a streak in silence is not acceptable, so the user is told and decides.
+  ///
+  /// In en, this message translates to:
+  /// **'You would need {missing} more this week and only {daysLeft} days are left. Saving will break the streak at the end of the week.'**
+  String formUnreachableWeek(int missing, int daysLeft);
+
+  /// The 3.4 warning for a monthly target.
+  ///
+  /// In en, this message translates to:
+  /// **'You would need {missing} more this month and only {daysLeft} days are left. Saving will break the streak at the end of the month.'**
+  String formUnreachableMonth(int missing, int daysLeft);
+
+  /// The 3.4 warning for a yearly target.
+  ///
+  /// In en, this message translates to:
+  /// **'You would need {missing} more this year and only {daysLeft} days are left. Saving will break the streak at the end of the year.'**
+  String formUnreachableYear(int missing, int daysLeft);
+
+  /// Confirms the change despite the warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Save anyway'**
+  String get formUnreachableConfirm;
+
+  /// Dismisses a confirmation without acting.
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get formBack;
+
+  /// Destructive action at the bottom of the edit form.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive goal'**
+  String get formArchive;
+
+  /// Explains that archiving is not deletion — habits are never hard-deleted because entries reference them.
+  ///
+  /// In en, this message translates to:
+  /// **'It leaves your list but keeps its history. Nothing is deleted.'**
+  String get formArchiveExplain;
+
+  /// Confirmation dialog title.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive this goal?'**
+  String get formArchiveConfirmTitle;
+
+  /// Confirms archiving.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get formArchiveConfirm;
+
+  /// Confirmation after archiving.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal archived.'**
+  String get formArchived;
+
   /// HabitCategory.health
   ///
   /// In en, this message translates to:

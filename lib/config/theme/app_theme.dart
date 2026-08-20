@@ -88,9 +88,14 @@ abstract final class AppTheme {
         }),
       ),
 
+      // `Size(64, 48)`, never `Size.fromHeight`. fromHeight sets the width to
+      // infinity, which is harmless for a button that fills its row and fatal
+      // for one sitting next to something else — it forces an infinite width
+      // constraint and the whole subtree fails to lay out. Buttons that should
+      // span the screen are wrapped in a full-width box at the call site.
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppSpacing.minTapTarget),
+          minimumSize: const Size(64, AppSpacing.minTapTarget),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.md),
           ),
@@ -100,10 +105,33 @@ abstract final class AppTheme {
       // Ghost style with a 1px accent border, per the design's secondary button.
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          minimumSize: const Size.fromHeight(AppSpacing.minTapTarget),
+          minimumSize: const Size(64, AppSpacing.minTapTarget),
           side: BorderSide(color: scheme.primary),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+        ),
+      ),
+
+      // Material fills the selected segment with `secondaryContainer`, which
+      // here is a blue that fights every other selected control on the same
+      // screen. Selection is green throughout, so this says so explicitly.
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (Set<WidgetState> states) =>
+                states.contains(WidgetState.selected)
+                    ? scheme.primary
+                    : Colors.transparent,
+          ),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (Set<WidgetState> states) =>
+                states.contains(WidgetState.selected)
+                    ? scheme.onPrimary
+                    : scheme.onSurfaceVariant,
+          ),
+          side: WidgetStatePropertyAll<BorderSide>(
+            BorderSide(color: scheme.outlineVariant),
           ),
         ),
       ),

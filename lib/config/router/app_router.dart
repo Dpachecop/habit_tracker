@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../presentation/l10n/l10n_extensions.dart';
+import '../../domain/entities/habit_color_slot.dart';
+import '../../presentation/screens/habit_form/habit_form_loader.dart';
+import '../../presentation/screens/habit_form/habit_form_screen.dart';
 import '../../presentation/screens/home/home_screen.dart';
 import '../../presentation/screens/shell/app_shell.dart';
 import '../../presentation/screens/shell/placeholder_screen.dart';
@@ -26,6 +29,24 @@ abstract final class AppRouter {
     return GoRouter(
       initialLocation: HomeScreen.routePath,
       routes: <RouteBase>[
+        // Declared *before* the shell and before the :habitId route. Before the
+        // shell so the form covers the navigation bar — it is a task, not a
+        // destination. Before :habitId because go_router matches in order and
+        // "new" would otherwise be read as an id.
+        GoRoute(
+          path: HabitFormScreen.createPath,
+          builder:
+              (BuildContext context, GoRouterState state) =>
+              // The caller suggests which palette slot to start on; it knows
+              // which ones are taken and this route does not.
+              HabitFormScreen(suggestedColor: state.extra as HabitColorSlot?),
+        ),
+        GoRoute(
+          path: HabitFormScreen.editPath,
+          builder:
+              (BuildContext context, GoRouterState state) =>
+                  HabitFormLoader(habitId: state.pathParameters['habitId']!),
+        ),
         // A *stateful* shell, not a plain one: each tab keeps its own navigation
         // stack and scroll offset, so switching away from a scrolled habit list
         // and back does not reset it.

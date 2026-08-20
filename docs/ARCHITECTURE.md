@@ -604,6 +604,8 @@ que la tarjeta mienta sobre a qué se comprometió el usuario.
   botón flotante— y meterla después obligaría a re-maquetar trabajo ya cerrado.
 - **Crear una meta se hace desde un botón flotante `+` en la Home.** Decidido por el dueño el
   2026-08-17: el `DESIGN.md` no tenía ninguna entrada al formulario y las cuatro pestañas están
-  ocupadas. Llega con la fase 4, y **reemplaza al botón temporal de sembrado**.
+  ocupadas. Implementado en la fase 4; **tocar una tarjeta** abre esa misma pantalla en modo
+  edición.
+- **No hay fecha en la cabecera.** Estaba en las capturas; el dueño la quitó el 2026-08-17.
 - **El saludo no lleva nombre.** El diseño dice "Good morning, Alex" pero la cuenta es anónima hasta
   la fase 7. Un saludo con un hueco donde va el nombre es peor que uno sin nombre.

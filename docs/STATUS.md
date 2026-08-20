@@ -5,8 +5,8 @@
 > desincronice.
 
 **Última actualización:** 2026-08-17
-**Fase actual:** 3 — Home **completada**, verificada en emulador Android.
-Siguiente: fase 4 (formulario de meta).
+**Fase actual:** 4 — Formulario **completado**, verificado en emulador Android.
+Siguiente: fase 5 (heatmap anual).
 **Arquitectura:** aprobada por el dueño el 2026-08-06, con las correcciones ya incorporadas.
 
 ---
@@ -132,16 +132,40 @@ entrega: nunca recalcula una racha ni decide si el check va habilitado.
 `lib/presentation/screens/shell/` — la barra de 4 pestañas con `StatefulShellRoute`, Home real y
 tres placeholders.
 
-`lib/presentation/screens/home/debug_seed_button.dart` — **andamio temporal, borrar en la fase 4.**
+`lib/presentation/screens/home/debug_seed_button.dart` — andamio temporal, **ya borrado en la fase 4.**
 Siembra tres metas que cubren todos los estados de tarjeta. Solo en debug (`kDebugMode`), fuera de
 release. Existe porque la fase 3 dibuja tarjetas y la 4 es la única forma de crear una.
 
 Nuevo en los contratos: `watchEntries({from, to})` — las entradas de **todas** las metas en una
 ventana. Una suscripción para toda la Home en vez de una por meta.
 
+### De la fase 4 — crear y editar metas
+
+`lib/domain/services/schedule_change_policy.dart` — **dominio, no formulario**, porque son reglas de
+negocio. Responde las dos preguntas de §3.4: desde cuándo aplica un horario nuevo (mañana para días
+concretos, hoy para un objetivo por período) y si el cambio deja el período abierto inalcanzable.
+
+`lib/presentation/blocs/habit_form/` — `HabitFormCubit`. Un Cubit y no un Bloc porque cada
+interacción es "el usuario puso este campo en este valor". Guarda **las dos ramas** del horario a la
+vez, así que alternar entre "días concretos" y "N veces" nunca pierde lo ya elegido.
+
+`lib/presentation/screens/habit_form/` — la pantalla, una sola para crear y editar. Se diferencian
+en tres sitios (título, aviso de vigencia, acción de archivar) y dos pantallas habrían duplicado
+todos los campos para evitar duplicar esos tres.
+
+El **botón `+`** en la Home abre el formulario; tocar una tarjeta lo abre en modo edición. La ruta
+de edición **carga la meta por id** en vez de recibirla por `extra`: es un solo camino que también
+funciona con un deep link, y con la caché offline resuelve en local.
+
+**Archivar** vive al fondo del formulario, con la frase que explica que no es un borrado. Sin ella,
+un botón rojo junto a la palabra "archivar" se lee como destructivo — y las metas nunca se borran
+porque las entradas las referencian.
+
+El **andamio de sembrado se borró**, como estaba previsto.
+
 ### Pruebas
 
-200 en verde, `flutter analyze` limpio. `test/domain/`:
+243 en verde, `flutter analyze` limpio. `test/domain/`:
 
 - `fixtures.dart` — constructores de metas y entradas; las fechas ancla son reales de 2026.
 - Entidades: `date_only`, `date_period`, `habit_schedule`, `habit`.
@@ -161,8 +185,11 @@ Y de la fase 3: `habits_bloc_test` (carga, las dos rachas, el toggle optimista y
 contador), `habit_card_test` (los tres estados, ambos idiomas, modo oscuro, y **dentro de un
 `ListView`** — ver abajo), `translations_test` ampliado.
 
-**Todavía no hay:** formulario para crear metas (fase 4), heatmap (fase 5), Analytics (fase 6),
-cuenta (fase 7).
+Y de la fase 4: `schedule_change_policy_test` (las dos reglas de §3.4, incluido el ejemplo del
+propio documento), `habit_form_cubit_test` (validación, creación, el append de versiones, la
+advertencia y sus tres salidas, archivar) y `habit_form_screen_test`.
+
+**Todavía no hay:** heatmap (fase 5), Analytics (fase 6), cuenta (fase 7).
 
 ---
 
@@ -201,6 +228,9 @@ No volver a abrirlas sin que el dueño lo pida.
 | **Modo oscuro** | Derivado por mí de los tokens `inverse-*` del propio diseño, no inventado. Pendiente de que el dueño lo revise |
 | **Barra de 4 pestañas en la fase 3** | Aunque solo Home tenga contenido. Cambia la geometría de todas las pantallas; meterla después obligaría a re-maquetar (§12.4) |
 | **Ventana de historial** | 400 días. Una racha más larga se lee truncada; el alternativo es bajar el historial completo para dibujar un número. `Streak.longest` de este bloc **no** sirve para Analytics |
+| **Tope del objetivo por período** | 7 / 28 / 365. Un día solo se cumple una vez, así que el techo es la longitud del bucket; 28 y no 31 en el mes porque si no, febrero rompería la racha por culpa del calendario |
+| **Vigencia acotada por abajo** | Si ya hay una versión pendiente para mañana, un cambio que propondría *hoy* se sube a esa fecha. Sin eso, `appendScheduleVersion` lanzaría; con eso, el último cambio gana y el pasado sigue intacto |
+| **La edición carga por id** | No por `extra` de la ruta. Un solo camino que también sirve para deep links y rutas restauradas |
 | **`minSdk` iOS = 15.0** | Subido del 12.0 de la plantilla porque `cloud_firestore` lo exige. El espejo exacto del caso de Android |
 | **Sin tests de Firestore real** | `fake_cloud_firestore` 4.1.1 no compila contra `cloud_firestore` 6.8, y la 4.2 exige Dart 3.8 (el proyecto está en 3.7.2). Ver *Pendientes* |
 
@@ -242,8 +272,6 @@ Antes de que la app arranque hace falta el paso manual de abajo.
 - **El estado deshabilitado del check es propuesta mía, no diseño del dueño.** Ninguna captura lo
   mostraba y es una regla central (§3.5). Está resuelto en §12.3 y funcionando; falta que el dueño
   lo apruebe o pase un frame propio.
-- **Borrar `debug_seed_button.dart` en la fase 4**, sustituyéndolo por el botón flotante `+` que
-  abre el formulario (decisión del dueño, `ARCHITECTURE.md` §12.4).
 - **App Check sin montar.** Es lo que evita que un tercero use tus credenciales de cliente para
   crear cuentas anónimas y gastar cuota. Las reglas ya impiden que lea datos ajenos; esto es cuota,
   no confidencialidad. Vale la pena antes de publicar.

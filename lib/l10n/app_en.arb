@@ -156,6 +156,124 @@
     "description": "Placeholder body for tabs whose phase has not been built yet."
   },
 
+  "formTitleCreate": "New goal",
+  "@formTitleCreate": { "description": "App bar title when creating a habit." },
+  "formTitleEdit": "Edit goal",
+  "@formTitleEdit": { "description": "App bar title when editing one." },
+  "formSave": "Save",
+  "@formSave": { "description": "Primary action of the habit form." },
+  "formSavedCreate": "Goal created.",
+  "@formSavedCreate": { "description": "Confirmation after creating a habit." },
+  "formSavedEdit": "Changes saved.",
+  "@formSavedEdit": { "description": "Confirmation after editing a habit." },
+
+  "formNameLabel": "Name",
+  "@formNameLabel": { "description": "Label of the habit name field." },
+  "formNameHint": "Morning meditation",
+  "@formNameHint": { "description": "Placeholder example in the name field." },
+  "formNameRequired": "Give your goal a name.",
+  "@formNameRequired": { "description": "Validation message for an empty name." },
+  "formCategoryLabel": "Category",
+  "@formCategoryLabel": { "description": "Section label for the category picker." },
+  "formColorLabel": "Color",
+  "@formColorLabel": { "description": "Section label for the color picker." },
+
+  "formScheduleLabel": "How often",
+  "@formScheduleLabel": { "description": "Section label for the schedule." },
+  "formScheduleModeWeekdays": "On set days",
+  "@formScheduleModeWeekdays": {
+    "description": "Schedule mode where the user names the weekdays. Distinct from the other mode because here the app decides which days count."
+  },
+  "formScheduleModeTimes": "A number of times",
+  "@formScheduleModeTimes": {
+    "description": "Schedule mode where the user only sets a count per period and picks the days freely."
+  },
+  "formWeekdaysRequired": "Pick at least one day.",
+  "@formWeekdaysRequired": { "description": "Validation message when no weekday is selected." },
+  "formEveryDay": "Every day",
+  "@formEveryDay": { "description": "Shortcut that selects all seven weekdays." },
+  "formTimesLabel": "Times",
+  "@formTimesLabel": { "description": "Label for the completions-per-period number." },
+  "formPeriodLabel": "Per",
+  "@formPeriodLabel": { "description": "Label before the period selector." },
+  "formPeriodWeek": "Week",
+  "@formPeriodWeek": { "description": "SchedulePeriod.week." },
+  "formPeriodMonth": "Month",
+  "@formPeriodMonth": { "description": "SchedulePeriod.month." },
+  "formPeriodYear": "Year",
+  "@formPeriodYear": { "description": "SchedulePeriod.year." },
+  "formTimesTooMany": "At most {max} — a day can only be completed once.",
+  "@formTimesTooMany": {
+    "description": "Validation when the target exceeds the days available in the period. February is why the monthly cap is 28.",
+    "placeholders": { "max": { "type": "int" } }
+  },
+
+  "formTimeWindowLabel": "Time of day",
+  "@formTimeWindowLabel": { "description": "Section label for the optional daily time window." },
+  "formAllDay": "All day",
+  "@formAllDay": { "description": "Toggle meaning no particular time of day." },
+  "formTimeFrom": "From",
+  "@formTimeFrom": { "description": "Start of the time window." },
+  "formTimeTo": "To",
+  "@formTimeTo": { "description": "End of the time window." },
+  "formTimeWindowInvalid": "The end has to come after the start.",
+  "@formTimeWindowInvalid": { "description": "Validation for an inverted time window." },
+
+  "formDatesLabel": "Dates",
+  "@formDatesLabel": { "description": "Section label for the date range." },
+  "formStartDate": "Starts",
+  "@formStartDate": { "description": "Label for the range start." },
+  "formEndDate": "Ends",
+  "@formEndDate": { "description": "Label for the range end." },
+  "formNoEndDate": "No end date",
+  "@formNoEndDate": { "description": "Toggle for an open-ended habit." },
+  "formEndBeforeStart": "The end cannot come before the start.",
+  "@formEndBeforeStart": { "description": "Validation for an inverted date range." },
+
+  "formScheduleChangeTomorrow": "The new days apply from tomorrow. Every day up to today keeps the old schedule, so the streak you have earned is safe.",
+  "@formScheduleChangeTomorrow": {
+    "description": "Notice shown when editing to a SpecificWeekdays schedule. ARCHITECTURE.md 3.4."
+  },
+  "formScheduleChangeToday": "The new target applies from today. The days you have already completed still count towards it.",
+  "@formScheduleChangeToday": {
+    "description": "Notice shown when editing to a TimesPerPeriod schedule. ARCHITECTURE.md 3.4."
+  },
+
+  "formUnreachableTitle": "This period is already out of reach",
+  "@formUnreachableTitle": { "description": "Dialog title for the 3.4 warning." },
+  "formUnreachableWeek": "You would need {missing} more this week and only {daysLeft} days are left. Saving will break the streak at the end of the week.",
+  "@formUnreachableWeek": {
+    "description": "The 3.4 warning for a weekly target. Burning a streak in silence is not acceptable, so the user is told and decides.",
+    "placeholders": { "missing": { "type": "int" }, "daysLeft": { "type": "int" } }
+  },
+  "formUnreachableMonth": "You would need {missing} more this month and only {daysLeft} days are left. Saving will break the streak at the end of the month.",
+  "@formUnreachableMonth": {
+    "description": "The 3.4 warning for a monthly target.",
+    "placeholders": { "missing": { "type": "int" }, "daysLeft": { "type": "int" } }
+  },
+  "formUnreachableYear": "You would need {missing} more this year and only {daysLeft} days are left. Saving will break the streak at the end of the year.",
+  "@formUnreachableYear": {
+    "description": "The 3.4 warning for a yearly target.",
+    "placeholders": { "missing": { "type": "int" }, "daysLeft": { "type": "int" } }
+  },
+  "formUnreachableConfirm": "Save anyway",
+  "@formUnreachableConfirm": { "description": "Confirms the change despite the warning." },
+  "formBack": "Go back",
+  "@formBack": { "description": "Dismisses a confirmation without acting." },
+
+  "formArchive": "Archive goal",
+  "@formArchive": { "description": "Destructive action at the bottom of the edit form." },
+  "formArchiveExplain": "It leaves your list but keeps its history. Nothing is deleted.",
+  "@formArchiveExplain": {
+    "description": "Explains that archiving is not deletion — habits are never hard-deleted because entries reference them."
+  },
+  "formArchiveConfirmTitle": "Archive this goal?",
+  "@formArchiveConfirmTitle": { "description": "Confirmation dialog title." },
+  "formArchiveConfirm": "Archive",
+  "@formArchiveConfirm": { "description": "Confirms archiving." },
+  "formArchived": "Goal archived.",
+  "@formArchived": { "description": "Confirmation after archiving." },
+
   "categoryHealth": "Health",
   "@categoryHealth": { "description": "HabitCategory.health" },
   "categoryFitness": "Fitness",

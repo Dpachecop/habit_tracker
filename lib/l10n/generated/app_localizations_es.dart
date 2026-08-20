@@ -169,6 +169,150 @@ class AppLocalizationsEs extends AppLocalizations {
   String get comingSoon => 'Muy pronto.';
 
   @override
+  String get formTitleCreate => 'Nueva meta';
+
+  @override
+  String get formTitleEdit => 'Editar meta';
+
+  @override
+  String get formSave => 'Guardar';
+
+  @override
+  String get formSavedCreate => 'Meta creada.';
+
+  @override
+  String get formSavedEdit => 'Cambios guardados.';
+
+  @override
+  String get formNameLabel => 'Nombre';
+
+  @override
+  String get formNameHint => 'Meditar en la mañana';
+
+  @override
+  String get formNameRequired => 'Ponle un nombre a tu meta.';
+
+  @override
+  String get formCategoryLabel => 'Categoría';
+
+  @override
+  String get formColorLabel => 'Color';
+
+  @override
+  String get formScheduleLabel => 'Con qué frecuencia';
+
+  @override
+  String get formScheduleModeWeekdays => 'Días concretos';
+
+  @override
+  String get formScheduleModeTimes => 'Un número de veces';
+
+  @override
+  String get formWeekdaysRequired => 'Elige al menos un día.';
+
+  @override
+  String get formEveryDay => 'Todos los días';
+
+  @override
+  String get formTimesLabel => 'Veces';
+
+  @override
+  String get formPeriodLabel => 'Por';
+
+  @override
+  String get formPeriodWeek => 'Semana';
+
+  @override
+  String get formPeriodMonth => 'Mes';
+
+  @override
+  String get formPeriodYear => 'Año';
+
+  @override
+  String formTimesTooMany(int max) {
+    return 'Máximo $max — un día solo se puede cumplir una vez.';
+  }
+
+  @override
+  String get formTimeWindowLabel => 'Franja del día';
+
+  @override
+  String get formAllDay => 'Todo el día';
+
+  @override
+  String get formTimeFrom => 'Desde';
+
+  @override
+  String get formTimeTo => 'Hasta';
+
+  @override
+  String get formTimeWindowInvalid =>
+      'El fin tiene que ser después del inicio.';
+
+  @override
+  String get formDatesLabel => 'Fechas';
+
+  @override
+  String get formStartDate => 'Empieza';
+
+  @override
+  String get formEndDate => 'Termina';
+
+  @override
+  String get formNoEndDate => 'Sin fecha de fin';
+
+  @override
+  String get formEndBeforeStart => 'El fin no puede ser antes del inicio.';
+
+  @override
+  String get formScheduleChangeTomorrow =>
+      'Los días nuevos aplican desde mañana. Todo hasta hoy conserva el horario anterior, así que la racha que ya ganaste está a salvo.';
+
+  @override
+  String get formScheduleChangeToday =>
+      'El objetivo nuevo aplica desde hoy. Los días que ya cumpliste siguen contando para él.';
+
+  @override
+  String get formUnreachableTitle => 'Este período ya no se alcanza';
+
+  @override
+  String formUnreachableWeek(int missing, int daysLeft) {
+    return 'Te faltarían $missing esta semana y solo quedan $daysLeft días. Si guardas, la racha se corta al terminar la semana.';
+  }
+
+  @override
+  String formUnreachableMonth(int missing, int daysLeft) {
+    return 'Te faltarían $missing este mes y solo quedan $daysLeft días. Si guardas, la racha se corta al terminar el mes.';
+  }
+
+  @override
+  String formUnreachableYear(int missing, int daysLeft) {
+    return 'Te faltarían $missing este año y solo quedan $daysLeft días. Si guardas, la racha se corta al terminar el año.';
+  }
+
+  @override
+  String get formUnreachableConfirm => 'Guardar de todos modos';
+
+  @override
+  String get formBack => 'Volver';
+
+  @override
+  String get formArchive => 'Archivar meta';
+
+  @override
+  String get formArchiveExplain =>
+      'Sale de tu lista pero conserva su historial. No se borra nada.';
+
+  @override
+  String get formArchiveConfirmTitle => '¿Archivar esta meta?';
+
+  @override
+  String get formArchiveConfirm => 'Archivar';
+
+  @override
+  String get formArchived => 'Meta archivada.';
+
+  @override
   String get categoryHealth => 'Salud';
 
   @override
