@@ -5,8 +5,8 @@
 > desincronice.
 
 **Última actualización:** 2026-08-17
-**Fase actual:** 5 — Cuadrícula de días **completada**, verificada en emulador Android.
-Siguiente: fase 6 (reportes).
+**Fase actual:** 5 — Cuadrícula de días **completada**, más la pantalla de detalle que el dueño
+pidió el 2026-08-20. Verificado en emulador. Siguiente: fase 6 (reportes).
 **Arquitectura:** aprobada por el dueño el 2026-08-06, con las correcciones ya incorporadas.
 
 ---
@@ -177,9 +177,30 @@ le pasa 240 días de estados y la tarjeta toma la cola que le entra.
 La tarjeta se reestructuró: la espina de color pasó de un `Row` estirado a un `Stack`. `IntrinsicHeight`
 **no puede contener un `LayoutBuilder`**, y el heatmap necesita uno para medir el ancho.
 
+### Detalle de meta — fuera del roadmap
+
+Pedido por el dueño el 2026-08-20 (`docs/design/screens/details_goal.jpeg`). Diseño en
+`ARCHITECTURE.md` §12.7.
+
+**Cambia la navegación**: tocar una tarjeta abre el detalle, y editar pasó a una acción dentro de
+él. `/habit/:id` es ver y `/habit/:id/edit` es editar, como subruta.
+
+`lib/presentation/blocs/habit_detail/` — lee la meta y **todas** sus entradas, sin ventana. Por eso
+la racha máxima de esta pantalla es la real y no la recortada por los 400 días de la Home.
+
+`lib/presentation/widgets/contribution_grid.dart` — el de 7 filas, con etiquetas de mes y de día.
+Distinto widget del de la tarjeta a propósito: aquel tiene 4 filas en orden de lectura y no puede
+llevar rótulos.
+
+`lib/presentation/widgets/month_calendar.dart` — un mes, solo lectura, con hoy en un anillo y los
+días cumplidos con un punto. Seis filas siempre, para que no salte al pasar de mes.
+
+Decisiones del dueño en esa sesión: **sin campo de descripción**, **calendario no tocable**, y el
+heatmap grande muestra **los meses que quepan** en vez de un año con scroll.
+
 ### Pruebas
 
-271 en verde, `flutter analyze` limpio. `test/domain/`:
+293 en verde, `flutter analyze` limpio. `test/domain/`:
 
 - `fixtures.dart` — constructores de metas y entradas; las fechas ancla son reales de 2026.
 - Entidades: `date_only`, `date_period`, `habit_schedule`, `habit`.
@@ -198,6 +219,10 @@ datasources en memoria — incluyendo que una escritura rechazada por §3.5 **no
 Y de la fase 3: `habits_bloc_test` (carga, las dos rachas, el toggle optimista y su reversión, el
 contador), `habit_card_test` (los tres estados, ambos idiomas, modo oscuro, y **dentro de un
 `ListView`** — ver abajo), `translations_test` ampliado.
+
+Y del detalle: `habit_detail_cubit_test` (carga, la racha sobre el historial completo, el paso de
+meses y su tope en el mes actual) y `detail_grids_test` (que una fila del grid sea un día de la
+semana, las etiquetas, el anillo de hoy, los puntos, y que el alto no cambie entre meses).
 
 Y de la fase 5: `habit_day_status_test` (los tres estados, el horario versionado, hoy y el futuro)
 y `habit_heatmap_test` (columnas por ancho, la cola correcta, el relleno, los tres tonos, y que
