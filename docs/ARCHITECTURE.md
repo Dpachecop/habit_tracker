@@ -597,8 +597,7 @@ que la tarjeta mienta sobre a qué se comprometió el usuario.
 
 ### 12.4 Alcance
 
-- **El heatmap por tarjeta es fase 5**, por decisión del dueño. La tarjeta de la fase 3 llega hasta
-  el renglón de estado.
+- **El heatmap por tarjeta se hizo en la fase 5.** Ver §12.5.
 - **La barra inferior de 4 pestañas se construyó en la fase 3** aunque solo la primera tenga
   contenido. Cambia la geometría de todas las pantallas —padding inferior, safe areas, dónde cabe un
   botón flotante— y meterla después obligaría a re-maquetar trabajo ya cerrado.
@@ -609,3 +608,43 @@ que la tarjeta mienta sobre a qué se comprometió el usuario.
 - **No hay fecha en la cabecera.** Estaba en las capturas; el dueño la quitó el 2026-08-17.
 - **El saludo no lleva nombre.** El diseño dice "Good morning, Alex" pero la cuenta es anónima hasta
   la fase 7. Un saludo con un hueco donde va el nombre es peor que uno sin nombre.
+
+### 12.5 La cuadrícula de días
+
+Va **dentro de cada tarjeta**, no como widget aparte bajo la lista: así lo puso el dueño en el
+diseño y así se construyó.
+
+**Cuatro filas leídas de izquierda a derecha**, es decir "los últimos N días" y no un calendario.
+El dueño lo eligió así el 2026-08-17 frente a la alternativa estilo GitHub de siete filas, donde
+una columna es una semana y se puede leer por patrón ("los martes fallo"). La forma de cuatro filas
+es más compacta y calca el Figma; el precio es que **una columna no significa nada**, y por eso la
+cuadrícula no lleva ninguna etiqueta: rotularla insinuaría una estructura que no tiene.
+
+Cuántas columnas caben es una pregunta sobre el ancho, así que la responde el widget. El bloc le
+entrega una cola larga de estados —240 días— y la tarjeta pinta los últimos que le caben.
+
+### 12.6 Tres estados, no dos
+
+Los tres tonos del diseño coinciden con algo que sí existe en el dominio, y `DayStatus` los nombra:
+
+| Estado | Cuándo | Cómo se pinta |
+|---|---|---|
+| `completed` | Hay entrada | El color de la meta |
+| `missed` | Tocaba, ya pasó, y no se cumplió | Gris neutro, visible |
+| `notDue` | No tocaba, fuera de rango, futuro, u **hoy mientras siga abierto** | Casi transparente |
+
+La distinción no es cosmética. En una meta de lunes/miércoles/sábado **los martes no son fallos**, y
+pintarlos igual que un fallo mentiría sobre la constancia del usuario — que es justo lo único que la
+cuadrícula existe para mostrar.
+
+Dos consecuencias que se siguen de las reglas ya establecidas:
+
+- **Una meta de N veces por período no tiene días fallados.** Si te pusiste 3 a la semana, los
+  cuatro días que no fuiste no son cuatro fracasos: quedarse corto es un hecho de *la semana*, y la
+  semana no es una celda. Solo se pintan los días cumplidos.
+- **Un fallo se pinta gris, no con el color de la meta desvaído.** Un color lavado se lee como
+  "a medias", y en esta app nada está a medias.
+
+El estado de un día usa `habit.scheduleOn(fecha)`, no el horario actual, por lo mismo de siempre: un
+día cumplido bajo las reglas de entonces sigue cumplido, y un cambio de horario no reescribe la
+cuadrícula hacia atrás.

@@ -5,8 +5,8 @@
 > desincronice.
 
 **Última actualización:** 2026-08-17
-**Fase actual:** 4 — Formulario **completado**, verificado en emulador Android.
-Siguiente: fase 5 (heatmap anual).
+**Fase actual:** 5 — Cuadrícula de días **completada**, verificada en emulador Android.
+Siguiente: fase 6 (reportes).
 **Arquitectura:** aprobada por el dueño el 2026-08-06, con las correcciones ya incorporadas.
 
 ---
@@ -163,9 +163,23 @@ porque las entradas las referencian.
 
 El **andamio de sembrado se borró**, como estaba previsto.
 
+### De la fase 5 — la cuadrícula de días
+
+`lib/domain/services/habit_day_status.dart` — **dominio**, porque "¿esto fue un fallo?" es una
+pregunta de negocio. Tres estados y no dos: cumplido, fallado, y **no tocaba**. Un martes en una
+meta de lunes/miércoles/sábado no es un fallo, y una meta de N veces por período no tiene días
+fallados en absoluto. Detalle en `ARCHITECTURE.md` §12.6.
+
+`lib/presentation/widgets/habit_heatmap.dart` — cuatro filas en orden de lectura, los últimos N días,
+con la última celda en hoy. Cuántas columnas caben lo decide el widget por ancho disponible; el bloc
+le pasa 240 días de estados y la tarjeta toma la cola que le entra.
+
+La tarjeta se reestructuró: la espina de color pasó de un `Row` estirado a un `Stack`. `IntrinsicHeight`
+**no puede contener un `LayoutBuilder`**, y el heatmap necesita uno para medir el ancho.
+
 ### Pruebas
 
-243 en verde, `flutter analyze` limpio. `test/domain/`:
+271 en verde, `flutter analyze` limpio. `test/domain/`:
 
 - `fixtures.dart` — constructores de metas y entradas; las fechas ancla son reales de 2026.
 - Entidades: `date_only`, `date_period`, `habit_schedule`, `habit`.
@@ -185,11 +199,15 @@ Y de la fase 3: `habits_bloc_test` (carga, las dos rachas, el toggle optimista y
 contador), `habit_card_test` (los tres estados, ambos idiomas, modo oscuro, y **dentro de un
 `ListView`** — ver abajo), `translations_test` ampliado.
 
+Y de la fase 5: `habit_day_status_test` (los tres estados, el horario versionado, hoy y el futuro)
+y `habit_heatmap_test` (columnas por ancho, la cola correcta, el relleno, los tres tonos, y que
+hable como una sola etiqueta y no como setenta y seis).
+
 Y de la fase 4: `schedule_change_policy_test` (las dos reglas de §3.4, incluido el ejemplo del
 propio documento), `habit_form_cubit_test` (validación, creación, el append de versiones, la
 advertencia y sus tres salidas, archivar) y `habit_form_screen_test`.
 
-**Todavía no hay:** heatmap (fase 5), Analytics (fase 6), cuenta (fase 7).
+**Todavía no hay:** Analytics (fase 6), cuenta (fase 7).
 
 ---
 
@@ -231,12 +249,22 @@ No volver a abrirlas sin que el dueño lo pida.
 | **Tope del objetivo por período** | 7 / 28 / 365. Un día solo se cumple una vez, así que el techo es la longitud del bucket; 28 y no 31 en el mes porque si no, febrero rompería la racha por culpa del calendario |
 | **Vigencia acotada por abajo** | Si ya hay una versión pendiente para mañana, un cambio que propondría *hoy* se sube a esa fecha. Sin eso, `appendScheduleVersion` lanzaría; con eso, el último cambio gana y el pasado sigue intacto |
 | **La edición carga por id** | No por `extra` de la ruta. Un solo camino que también sirve para deep links y rutas restauradas |
+| **Cuadrícula de 4 filas** | Orden de lectura, no calendario. Elegida por el dueño sobre la de 7 filas estilo GitHub: más compacta y calca el Figma, a cambio de que una columna no signifique nada (§12.5) |
+| **Un fallo se pinta gris** | No con el color de la meta desvaído. Un color lavado se lee como "a medias" y aquí nada está a medias |
 | **`minSdk` iOS = 15.0** | Subido del 12.0 de la plantilla porque `cloud_firestore` lo exige. El espejo exacto del caso de Android |
 | **Sin tests de Firestore real** | `fake_cloud_firestore` 4.1.1 no compila contra `cloud_firestore` 6.8, y la 4.2 exige Dart 3.8 (el proyecto está en 3.7.2). Ver *Pendientes* |
 
 ---
 
 ## Qué sigue
+
+**Fase 6 — Reportes.** `ReportsBloc` y las gráficas de `fl_chart` en la pestaña Analytics, que hoy
+es un placeholder. Ojo con una trampa ya anotada: `Streak.longest` que sale de `HabitsBloc` es solo
+el máximo **dentro de la ventana de 400 días**, así que Analytics necesita su propia lectura más
+ancha y no puede reutilizar ese número.
+
+La pantalla de Analytics del diseño (`docs/design/screens/analytics_screen.png`) pide consistencia
+general, racha más larga, total de cumplimientos y una gráfica por meta.
 
 **Fase 3 — Home.** `HabitsBloc` alimentado por `watchHabits()`, `HabitCard` con la racha y el
 check en el color de la meta, y el toggle optimista. Los repositorios ya están inyectados en el
