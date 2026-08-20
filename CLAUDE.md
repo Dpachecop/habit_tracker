@@ -70,6 +70,11 @@ exceptions.** That file is the source of truth; the notes below only add what it
 - **Branches stack.** Until a phase is merged, the next one branches off it, so its PR must target
   its parent (`gh pr create --base <parent>`) and not `main`. Based on `main`, every diff would
   carry all the earlier phases and be unreviewable.
+- **Run `flutter pub get` after every branch switch.** Each phase has its own `pubspec.lock` —
+  `feat/domain` predates Firebase, `feat/l10n` predates Inter — so a checkout swaps the lockfile and
+  leaves `.dart_tool` resolved against packages that are no longer there. The symptom is a wall of
+  "Target of URI doesn't exist" in `test/`, with `lib/` untouched: that is never the code. Recover
+  with `git checkout -- pubspec.lock && flutter pub get`.
 - Branch names follow `<type>/<kebab-name>`: `feat/habit-form`, `fix/streak-week-boundary`,
   `docs/commit-rules`.
 - `flutter analyze` must be clean before any commit.
@@ -78,7 +83,7 @@ exceptions.** That file is the source of truth; the notes below only add what it
 ## Commands
 
 ```bash
-flutter pub get                  # after any pubspec.yaml change
+flutter pub get                  # after any pubspec.yaml change AND after every branch switch
 flutter run                      # attached device; flutter devices to list targets
 flutter analyze                  # lint + type check (flutter_lints)
 dart format lib test
